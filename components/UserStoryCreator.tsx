@@ -119,6 +119,29 @@ export function UserStoryCreator() {
     setUserStoryData(data);
   }, []);
 
+  const handleClear = useCallback(async () => {
+    try {
+      await fetch("/api/user-stories/delete-all", {
+        method: "DELETE",
+      });
+    } catch (error) {
+      console.error("Error clearing user stories:", error);
+    }
+
+    setUserStoryData({
+      role: "",
+      action: "",
+      benefit: "",
+      background: "",
+      acceptanceCriteria: [""],
+      technicalInfo: [""],
+    });
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+  }, []);
+
   if (!isAuthenticated) {
     return <PasswordGate onAuthenticated={() => setIsAuthenticated(true)} />;
   }
@@ -166,7 +189,7 @@ export function UserStoryCreator() {
             transition={{ duration: 0.4, delay: 0.2 }}
             className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
           >
-            <UserStoryPreview data={userStoryData} />
+            <UserStoryPreview data={userStoryData} onClear={handleClear} />
           </motion.div>
         </div>
       </div>

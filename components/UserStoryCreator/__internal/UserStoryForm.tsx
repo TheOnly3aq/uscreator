@@ -1,15 +1,15 @@
 "use client";
 
+import { UserStoryFormProps } from "@/types/userStoryComponents";
 import { UserStoryData } from "@/types/userStory";
 import { RichTextEditor } from "./RichTextEditor";
 
-interface UserStoryFormProps {
-  data: UserStoryData;
-  onChange: (data: UserStoryData) => void;
-}
-
 /**
  * Form component for user story input fields
+ * @param {UserStoryFormProps} props - Component props
+ * @param {UserStoryData} props.data - Current user story data
+ * @param {(data: UserStoryData) => void} props.onChange - Callback function called when form data changes
+ * @returns {JSX.Element} The user story form component
  */
 export function UserStoryForm({ data, onChange }: UserStoryFormProps) {
   const handleChange = (

@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { UserStoryPreviewProps } from "@/types/userStoryComponents";
 import { UserStoryData } from "@/types/userStory";
 import { formatUserStory } from "@/utils/userStoryFormatter";
 import { renderMarkdown } from "@/utils/markdownRenderer";
 import { motion } from "framer-motion";
 
-interface UserStoryPreviewProps {
-  data: UserStoryData;
-  onClear: () => void;
-  onSaveToHistory: () => void;
-}
-
 /**
  * Preview component that displays the formatted user story
+ * @param {UserStoryPreviewProps} props - Component props
+ * @param {UserStoryData} props.data - User story data to preview
+ * @param {() => void} props.onClear - Callback function to clear the form
+ * @param {() => void} props.onSaveToHistory - Callback function called when story is copied to save to history
+ * @returns {JSX.Element} The user story preview component
  */
 export function UserStoryPreview({
   data,

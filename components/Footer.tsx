@@ -1,5 +1,6 @@
 /**
  * Footer component displaying creator information and links
+ * @returns {JSX.Element} The footer component
  */
 export function Footer() {
   return (

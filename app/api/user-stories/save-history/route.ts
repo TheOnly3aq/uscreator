@@ -23,15 +23,13 @@ export async function POST(request: NextRequest) {
     const db = getPool();
 
     // Count existing history items
-    const [countRows] = await db.execute<
-      RowDataPacket & { count: number }[]
-    >(
+    const [countRows] = await db.execute<RowDataPacket[]>(
       `SELECT COUNT(*) as count FROM user_stories 
        WHERE session_id = ? AND is_draft = FALSE`,
       [sessionId]
     );
 
-    const count = countRows[0]?.count || 0;
+    const count = (countRows[0] as { count: number })?.count || 0;
 
     // If we have 10 or more, delete the oldest ones
     if (count >= 10) {

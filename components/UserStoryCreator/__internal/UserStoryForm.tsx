@@ -1,6 +1,7 @@
 "use client";
 
 import { UserStoryData } from "@/types/userStory";
+import { RichTextEditor } from "./RichTextEditor";
 
 interface UserStoryFormProps {
   data: UserStoryData;
@@ -111,12 +112,9 @@ export function UserStoryForm({ data, onChange }: UserStoryFormProps) {
           Background/Context{" "}
           <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
         </label>
-        <textarea
-          id="background"
+        <RichTextEditor
           value={data.background || ""}
-          onChange={(e) => handleChange("background", e.target.value)}
-          rows={3}
-          className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-none"
+          onChange={(value) => handleChange("background", value)}
           placeholder="Additional context or background information"
         />
       </div>

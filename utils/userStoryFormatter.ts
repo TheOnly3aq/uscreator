@@ -1,4 +1,20 @@
 import { UserStoryData } from '@/types/userStory';
+import TurndownService from 'turndown';
+
+const turndownService = new TurndownService();
+
+/**
+ * Converts HTML to markdown, preserving formatting and lists
+ */
+function htmlToMarkdown(html: string): string {
+  if (!html || !html.trim()) {
+    return '';
+  }
+  if (html.includes('<')) {
+    return turndownService.turndown(html).trim();
+  }
+  return html.trim();
+}
 
 /**
  * Formats user story data into a formatted string for copying
@@ -12,10 +28,13 @@ export function formatUserStory(data: UserStoryData): string {
   parts.push('');
 
   if (data.background && data.background.trim()) {
-    parts.push('**Background/Context:**');
-    parts.push('');
-    parts.push(`- ${data.background.trim()}`);
-    parts.push('');
+    const backgroundMarkdown = htmlToMarkdown(data.background);
+    if (backgroundMarkdown) {
+      parts.push('**Background/Context:**');
+      parts.push('');
+      parts.push(backgroundMarkdown);
+      parts.push('');
+    }
   }
 
   if (data.acceptanceCriteria && data.acceptanceCriteria.length > 0) {

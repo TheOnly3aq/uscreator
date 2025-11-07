@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { motion } from "framer-motion";
 import { UserStoryData } from "@/types/userStory";
 import { getCookie } from "@/utils/cookies";
@@ -25,7 +25,9 @@ export function UserStoryCreator() {
   useEffect(() => {
     const cookie = getCookie();
     if (cookie === "authenticated") {
-      setIsAuthenticated(true);
+      startTransition(() => {
+        setIsAuthenticated(true);
+      });
     }
   }, []);
 
@@ -34,7 +36,7 @@ export function UserStoryCreator() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 py-12 px-4">
+    <div className="bg-zinc-50 dark:bg-zinc-950 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -76,4 +78,3 @@ export function UserStoryCreator() {
     </div>
   );
 }
-

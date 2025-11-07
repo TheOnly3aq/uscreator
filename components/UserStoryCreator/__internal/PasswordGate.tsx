@@ -40,6 +40,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
       }
     } catch (err) {
       setError("Failed to authenticate. Please try again.");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -51,7 +52,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4"
+        className="flex flex-1 items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4"
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
@@ -103,4 +104,3 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
     </AnimatePresence>
   );
 }
-

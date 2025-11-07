@@ -50,7 +50,7 @@ The application follows a component-based architecture with:
 2. Install dependencies:
 
 ```bash
-npm install
+pnpm i
 ```
 
 3. Create a `.env` file in the root directory:
@@ -68,7 +68,7 @@ PASSWORD=your-secure-password-here
 5. Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser
@@ -76,8 +76,8 @@ npm run dev
 ### Building for Production
 
 ```bash
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ## Project Structure

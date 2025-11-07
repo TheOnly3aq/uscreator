@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
     const [rows] = await db.execute<UserStoryRecord[]>(
       `SELECT id, role, action, benefit, background, acceptance_criteria, technical_info, created_at, updated_at
        FROM user_stories
-       WHERE session_id = ?
-       ORDER BY updated_at DESC
-       LIMIT 100`,
+       WHERE session_id = ? AND is_draft = FALSE
+       ORDER BY created_at DESC
+       LIMIT 10`,
       [sessionId]
     );
 

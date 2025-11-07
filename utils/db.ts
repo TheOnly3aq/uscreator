@@ -3,6 +3,7 @@
  */
 
 import mysql from "mysql2/promise";
+import { RowDataPacket } from "mysql2";
 
 /**
  * Creates a database connection pool
@@ -64,11 +65,28 @@ export async function initializeDatabase(): Promise<void> {
       background TEXT,
       acceptance_criteria JSON,
       technical_info JSON,
+      is_draft BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_session_id (session_id),
+      INDEX idx_session_draft (session_id, is_draft),
       INDEX idx_created_at (created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
+
+  // Add is_draft column if it doesn't exist (for existing databases)
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'is_draft'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN is_draft BOOLEAN DEFAULT FALSE
+      `);
+    }
+  } catch {
+    // Column might already exist, ignore error
+  }
 }
 

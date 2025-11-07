@@ -26,29 +26,30 @@ export function History({ onLoadStory }: HistoryProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  useEffect(() => {
-    const loadHistory = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await fetch("/api/user-stories/history");
-        const { history: historyData, error: errorMessage } =
-          await response.json();
+  const loadHistory = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/user-stories/history");
+      const { history: historyData, error: errorMessage } =
+        await response.json();
 
-        if (errorMessage) {
-          setError(errorMessage);
-        } else {
-          setHistory(historyData || []);
-        }
-      } catch (err) {
-        setError("Failed to load history");
-        console.error(err);
-      } finally {
-        setIsLoading(false);
+      if (errorMessage) {
+        setError(errorMessage);
+      } else {
+        setHistory(historyData || []);
       }
-    };
+    } catch (err) {
+      setError("Failed to load history");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const formatDate = (date: Date | string) => {
@@ -65,6 +66,29 @@ export function History({ onLoadStory }: HistoryProps) {
   const handleLoadStory = (item: HistoryItem) => {
     onLoadStory(item.data);
     setSelectedId(item.id);
+  };
+
+  const handleDelete = async (itemId: number) => {
+    try {
+      const response = await fetch(`/api/user-stories/delete?id=${itemId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove the item from the local state
+        setHistory((prev) => prev.filter((item) => item.id !== itemId));
+        // Clear selection if the deleted item was selected
+        if (selectedId === itemId) {
+          setSelectedId(null);
+        }
+      } else {
+        const { error } = await response.json();
+        setError(error || "Failed to delete user story");
+      }
+    } catch (err) {
+      setError("Failed to delete user story");
+      console.error(err);
+    }
   };
 
   if (isLoading) {
@@ -130,13 +154,22 @@ export function History({ onLoadStory }: HistoryProps) {
                     Created: {formatDate(item.createdAt)}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleLoadStory(item)}
-                  className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors text-sm font-medium ml-4"
-                >
-                  Load
-                </button>
+                <div className="flex gap-2 ml-4">
+                  <button
+                    type="button"
+                    onClick={() => handleLoadStory(item)}
+                    className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors text-sm font-medium"
+                  >
+                    Load
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(item.id)}
+                    className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors text-sm font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
               <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
                 <div className="text-sm leading-relaxed">

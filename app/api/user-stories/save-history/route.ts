@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 import { UserStoryData } from "@/types/userStory";
+import { RowDataPacket } from "mysql2";
 
 /**
- * POST handler - saves user story data as draft (auto-save, overwrites previous draft)
+ * POST handler - saves user story to history (when Copy is clicked)
+ * Limits to 10 history items per user, deletes oldest if exceeded
  */
 export async function POST(request: NextRequest) {
   try {
@@ -20,17 +22,39 @@ export async function POST(request: NextRequest) {
     const data: UserStoryData = await request.json();
     const db = getPool();
 
-    // Delete existing draft for this session
-    await db.execute(
-      `DELETE FROM user_stories WHERE session_id = ? AND is_draft = TRUE`,
+    // Count existing history items
+    const [countRows] = await db.execute<
+      RowDataPacket & { count: number }[]
+    >(
+      `SELECT COUNT(*) as count FROM user_stories 
+       WHERE session_id = ? AND is_draft = FALSE`,
       [sessionId]
     );
 
-    // Insert new draft
+    const count = countRows[0]?.count || 0;
+
+    // If we have 10 or more, delete the oldest ones
+    if (count >= 10) {
+      const deleteCount = count - 9;
+      await db.execute(
+        `DELETE FROM user_stories 
+         WHERE id IN (
+           SELECT id FROM (
+             SELECT id FROM user_stories
+             WHERE session_id = ? AND is_draft = FALSE
+             ORDER BY created_at ASC
+             LIMIT ?
+           ) AS temp
+         )`,
+        [sessionId, deleteCount]
+      );
+    }
+
+    // Insert new history entry
     await db.execute(
       `INSERT INTO user_stories 
        (session_id, role, action, benefit, background, acceptance_criteria, technical_info, is_draft)
-       VALUES (?, ?, ?, ?, ?, ?, ?, TRUE)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, FALSE)`,
       [
         sessionId,
         data.role || null,
@@ -44,9 +68,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error saving user story:", error);
+    console.error("Error saving to history:", error);
     return NextResponse.json(
-      { error: "Failed to save user story" },
+      { error: "Failed to save to history" },
       { status: 500 }
     );
   }

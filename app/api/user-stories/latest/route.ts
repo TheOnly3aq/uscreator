@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const [rows] = await db.execute<UserStoryRecord[]>(
       `SELECT role, action, benefit, background, acceptance_criteria, technical_info
        FROM user_stories
-       WHERE session_id = ?
+       WHERE session_id = ? AND is_draft = TRUE
        ORDER BY updated_at DESC
        LIMIT 1`,
       [sessionId]

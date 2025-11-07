@@ -9,12 +9,17 @@ import { motion } from "framer-motion";
 interface UserStoryPreviewProps {
   data: UserStoryData;
   onClear: () => void;
+  onSaveToHistory: () => void;
 }
 
 /**
  * Preview component that displays the formatted user story
  */
-export function UserStoryPreview({ data, onClear }: UserStoryPreviewProps) {
+export function UserStoryPreview({
+  data,
+  onClear,
+  onSaveToHistory,
+}: UserStoryPreviewProps) {
   const formattedStory = formatUserStory(data);
   const [copied, setCopied] = useState(false);
 
@@ -23,6 +28,7 @@ export function UserStoryPreview({ data, onClear }: UserStoryPreviewProps) {
       await navigator.clipboard.writeText(formattedStory);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      onSaveToHistory();
     } catch (error) {
       console.error("Failed to copy:", error);
     }

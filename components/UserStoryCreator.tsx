@@ -13,14 +13,12 @@ import { getCookie, setSessionId, getSessionId } from "@/utils/cookies";
 import { PasswordGate } from "./UserStoryCreator/__internal/PasswordGate";
 import { UserStoryForm } from "./UserStoryCreator/__internal/UserStoryForm";
 import { UserStoryPreview } from "./UserStoryCreator/__internal/UserStoryPreview";
-import { History } from "./UserStoryCreator/__internal/History";
 
 /**
  * Main user story creator component
  */
 export function UserStoryCreator() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<"form" | "history">("form");
   const [userStoryData, setUserStoryData] = useState<UserStoryData>({
     role: "",
     action: "",
@@ -121,11 +119,6 @@ export function UserStoryCreator() {
     setUserStoryData(data);
   }, []);
 
-  const handleLoadStory = useCallback((data: UserStoryData) => {
-    setUserStoryData(data);
-    setActiveTab("form");
-  }, []);
-
   if (!isAuthenticated) {
     return <PasswordGate onAuthenticated={() => setIsAuthenticated(true)} />;
   }
@@ -154,64 +147,28 @@ export function UserStoryCreator() {
           </p>
         </motion.div>
 
-        <div className="mb-6 flex gap-2 border-b border-zinc-200 dark:border-zinc-800">
-          <button
-            type="button"
-            onClick={() => setActiveTab("form")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "form"
-                ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-            }`}
-          >
-            Form
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("history")}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "history"
-                ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-            }`}
-          >
-            History
-          </button>
-        </div>
-
-        {activeTab === "form" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
-            >
-              <h2 className="text-xl font-semibold mb-6 text-zinc-900 dark:text-zinc-100">
-                Form
-              </h2>
-              <UserStoryForm data={userStoryData} onChange={handleDataChange} />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
-            >
-              <UserStoryPreview data={userStoryData} />
-            </motion.div>
-          </div>
-        ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
             className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
           >
-            <History onLoadStory={handleLoadStory} />
+            <h2 className="text-xl font-semibold mb-6 text-zinc-900 dark:text-zinc-100">
+              Form
+            </h2>
+            <UserStoryForm data={userStoryData} onChange={handleDataChange} />
           </motion.div>
-        )}
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
+          >
+            <UserStoryPreview data={userStoryData} />
+          </motion.div>
+        </div>
       </div>
     </div>
   );

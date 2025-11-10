@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 
 /**
- * DELETE handler - deletes all user stories for the current session
+ * DELETE handler - deletes only draft user stories for the current session (not history)
  */
 export async function DELETE(request: NextRequest) {
   try {
@@ -18,15 +18,15 @@ export async function DELETE(request: NextRequest) {
 
     const db = getPool();
     await db.execute(
-      `DELETE FROM user_stories WHERE session_id = ?`,
+      `DELETE FROM user_stories WHERE session_id = ? AND is_draft = TRUE`,
       [sessionId]
     );
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting user stories:", error);
+    console.error("Error deleting draft user stories:", error);
     return NextResponse.json(
-      { error: "Failed to delete user stories" },
+      { error: "Failed to delete draft user stories" },
       { status: 500 }
     );
   }

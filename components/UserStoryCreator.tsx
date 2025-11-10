@@ -16,7 +16,8 @@ import { UserStoryPreview } from "./UserStoryCreator/__internal/UserStoryPreview
 import { History } from "./UserStoryCreator/__internal/History";
 
 /**
- * Main user story creator component
+ * Main user story creator component that manages authentication, form state, and user story creation
+ * @returns {JSX.Element} The user story creator component or password gate if not authenticated
  */
 export function UserStoryCreator() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,14 +39,14 @@ export function UserStoryCreator() {
       try {
         const existingSessionId = getSessionId();
         if (!existingSessionId) {
-          const response = await fetch("/api/session");
+          const response = await fetch("/api/session/");
           const { sessionId } = await response.json();
           if (sessionId) {
             setSessionId(sessionId);
           }
         }
 
-        const latestResponse = await fetch("/api/user-stories/latest");
+        const latestResponse = await fetch("/api/user-stories/latest/");
         const { data } = await latestResponse.json();
         if (data) {
           setUserStoryData(data);
@@ -61,6 +62,10 @@ export function UserStoryCreator() {
     if (cookie === "authenticated") {
       startTransition(() => {
         setIsAuthenticated(true);
+        const savedTab = localStorage.getItem("userstory_active_tab");
+        if (savedTab && (savedTab === "form" || savedTab === "history")) {
+          setActiveTab(savedTab as "form" | "history");
+        }
       });
       if (!hasInitializedRef.current) {
         initializeSession();
@@ -83,7 +88,7 @@ export function UserStoryCreator() {
 
     setIsSaving(true);
     try {
-      await fetch("/api/user-stories/save", {
+      await fetch("/api/user-stories/save/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -123,7 +128,7 @@ export function UserStoryCreator() {
 
   const handleClear = useCallback(async () => {
     try {
-      await fetch("/api/user-stories/delete-all", {
+      await fetch("/api/user-stories/delete-all/", {
         method: "DELETE",
       });
     } catch (error) {
@@ -158,7 +163,7 @@ export function UserStoryCreator() {
     }
 
     try {
-      await fetch("/api/user-stories/save-history", {
+      await fetch("/api/user-stories/save-history/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -173,6 +178,7 @@ export function UserStoryCreator() {
   const handleLoadStory = useCallback((data: UserStoryData) => {
     setUserStoryData(data);
     setActiveTab("form");
+    localStorage.setItem("userstory_active_tab", "form");
   }, []);
 
   if (!isAuthenticated) {
@@ -206,7 +212,10 @@ export function UserStoryCreator() {
         <div className="mb-6 flex gap-2 border-b border-zinc-200 dark:border-zinc-800">
           <button
             type="button"
-            onClick={() => setActiveTab("form")}
+            onClick={() => {
+              setActiveTab("form");
+              localStorage.setItem("userstory_active_tab", "form");
+            }}
             className={`px-4 py-2 font-medium transition-colors ${
               activeTab === "form"
                 ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
@@ -217,7 +226,10 @@ export function UserStoryCreator() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("history")}
+            onClick={() => {
+              setActiveTab("history");
+              localStorage.setItem("userstory_active_tab", "history");
+            }}
             className={`px-4 py-2 font-medium transition-colors ${
               activeTab === "history"
                 ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"

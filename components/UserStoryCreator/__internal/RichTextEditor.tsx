@@ -4,15 +4,15 @@ import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-
-interface RichTextEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-}
+import { RichTextEditorProps } from "@/types/userStoryComponents";
 
 /**
  * Rich text editor component with formatting and list editing features
+ * @param {RichTextEditorProps} props - Component props
+ * @param {string} props.value - Current HTML content value
+ * @param {(value: string) => void} props.onChange - Callback function called when content changes
+ * @param {string} [props.placeholder] - Placeholder text to display when editor is empty
+ * @returns {JSX.Element | null} The rich text editor component or null if editor is not initialized
  */
 export function RichTextEditor({
   value,

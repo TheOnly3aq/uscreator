@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { setCookie } from "@/utils/cookies";
 
-interface PasswordGateProps {
+interface AdminLoginProps {
   onAuthenticated: () => void;
 }
 
 /**
- * Password protection component that gates access to the application
+ * Admin login component that gates access to the admin dashboard
+ * @param {AdminLoginProps} props - Component props
+ * @param {() => void} props.onAuthenticated - Callback function called when authentication succeeds
  */
-export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
+export function AdminLogin({ onAuthenticated }: AdminLoginProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +23,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/", {
+      const response = await fetch("/api/admin/auth/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +34,6 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setCookie("authenticated", 7);
         onAuthenticated();
       } else {
         setError(data.error || "Invalid password");
@@ -62,10 +62,10 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
         >
           <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-8 border border-zinc-200 dark:border-zinc-800">
             <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">
-              User Story Creator
+              Admin Dashboard
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-              Please enter the password to continue
+              Please enter the admin password to continue
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -77,7 +77,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
                     setError("");
                   }}
                   className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                  placeholder="Enter password"
+                  placeholder="Enter admin password"
                   autoFocus
                 />
                 {error && (
@@ -95,7 +95,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
                 disabled={isLoading}
                 className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white transition-colors font-medium"
               >
-                {isLoading ? "Authenticating..." : "Continue"}
+                {isLoading ? "Authenticating..." : "Login"}
               </button>
             </form>
           </div>

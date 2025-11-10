@@ -19,6 +19,10 @@ interface HistoryProps {
 
 /**
  * History component that displays saved user stories
+ * @param {HistoryProps} props - Component props
+ * @param {(data: UserStoryData) => void} props.onLoadStory - Callback function to load a story
+ * 
+ * @returns {JSX.Element} The history component
  */
 export function History({ onLoadStory }: HistoryProps) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -30,7 +34,7 @@ export function History({ onLoadStory }: HistoryProps) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/user-stories/history");
+      const response = await fetch("/api/user-stories/history/");
       const { history: historyData, error: errorMessage } =
         await response.json();
 
@@ -49,7 +53,6 @@ export function History({ onLoadStory }: HistoryProps) {
 
   useEffect(() => {
     loadHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const formatDate = (date: Date | string) => {
@@ -75,9 +78,7 @@ export function History({ onLoadStory }: HistoryProps) {
       });
 
       if (response.ok) {
-        // Remove the item from the local state
         setHistory((prev) => prev.filter((item) => item.id !== itemId));
-        // Clear selection if the deleted item was selected
         if (selectedId === itemId) {
           setSelectedId(null);
         }

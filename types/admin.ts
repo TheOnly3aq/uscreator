@@ -19,6 +19,10 @@ export interface SessionStat {
   savedStories: number;
   firstActivity: string;
   lastActivity: string;
+  userAgent: string | null;
+  ipAddresses: string[];
+  firstSeen: string | null;
+  lastSeen: string | null;
 }
 
 export interface OverallStats {

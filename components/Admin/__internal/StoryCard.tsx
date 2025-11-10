@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { AdminUserStory } from "@/types/admin";
 
 interface StoryCardProps {
   story: AdminUserStory;
+  onDeleteStory: (storyId: number) => Promise<void>;
 }
 
 function formatDate(dateString: string) {
@@ -12,8 +14,26 @@ function formatDate(dateString: string) {
  * Story card component displaying individual user story details
  * @param {StoryCardProps} props - Component props
  * @param {AdminUserStory} props.story - User story data to display
+ * @param {(storyId: number) => Promise<void>} props.onDeleteStory - Callback function to delete a story
  */
-export function StoryCard({ story }: StoryCardProps) {
+export function StoryCard({ story, onDeleteStory }: StoryCardProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this story?")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await onDeleteStory(story.id);
+    } catch (error) {
+      console.error("Error deleting story:", error);
+      alert("Failed to delete story");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 border border-zinc-200 dark:border-zinc-800">
       <div className="flex items-start justify-between mb-4">
@@ -32,9 +52,18 @@ export function StoryCard({ story }: StoryCardProps) {
             Session: {story.sessionId.substring(0, 16)}...
           </p>
         </div>
-        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-          <div>Created: {formatDate(story.createdAt)}</div>
-          <div>Updated: {formatDate(story.updatedAt)}</div>
+        <div className="flex items-start gap-4">
+          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+            <div>Created: {formatDate(story.createdAt)}</div>
+            <div>Updated: {formatDate(story.updatedAt)}</div>
+          </div>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </button>
         </div>
       </div>
 

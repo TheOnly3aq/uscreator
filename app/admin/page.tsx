@@ -95,6 +95,41 @@ export default function AdminDashboard() {
     localStorage.setItem("admin_active_tab", "stories");
   };
 
+  const handleDeleteSession = async (sessionId: string) => {
+    try {
+      const response = await fetch(`/api/admin/sessions/${sessionId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        await fetchData();
+        if (selectedSessionId === sessionId) {
+          setSelectedSessionId(null);
+        }
+      } else {
+        throw new Error("Failed to delete session");
+      }
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      throw error;
+    }
+  };
+
+  const handleDeleteStory = async (storyId: number) => {
+    try {
+      const response = await fetch(`/api/admin/stories/${storyId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        await fetchData();
+      } else {
+        throw new Error("Failed to delete story");
+      }
+    } catch (error) {
+      console.error("Error deleting story:", error);
+      throw error;
+    }
+  };
+
   const filteredStories = selectedSessionId
     ? data?.stories.filter((s) => s.sessionId === selectedSessionId) || []
     : data?.stories || [];
@@ -127,6 +162,7 @@ export default function AdminDashboard() {
           <SessionsTab
             sessionStats={data.sessionStats}
             onViewStories={handleViewStories}
+            onDeleteSession={handleDeleteSession}
           />
         )}
         {activeTab === "stories" && (
@@ -134,6 +170,7 @@ export default function AdminDashboard() {
             stories={filteredStories}
             selectedSessionId={selectedSessionId}
             onClearFilter={() => setSelectedSessionId(null)}
+            onDeleteStory={handleDeleteStory}
           />
         )}
       </div>

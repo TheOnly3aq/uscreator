@@ -88,5 +88,32 @@ export async function initializeDatabase(): Promise<void> {
   } catch {
     // Column might already exist, ignore error
   }
+
+  // Create sessions table for storing session metadata
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS sessions (
+      session_id VARCHAR(255) PRIMARY KEY,
+      user_agent TEXT,
+      ip_addresses JSON,
+      first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_last_seen (last_seen)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+  // Add ip_addresses column if it doesn't exist (for existing databases)
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM sessions LIKE 'ip_addresses'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE sessions 
+        ADD COLUMN ip_addresses JSON
+      `);
+    }
+  } catch {
+    // Column might already exist, ignore error
+  }
 }
 

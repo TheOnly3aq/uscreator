@@ -7,6 +7,7 @@ interface StoriesTabProps {
   stories: AdminUserStory[];
   selectedSessionId: string | null;
   onClearFilter: () => void;
+  onDeleteStory: (storyId: number) => Promise<void>;
 }
 
 /**
@@ -15,11 +16,13 @@ interface StoriesTabProps {
  * @param {AdminUserStory[]} props.stories - Array of user stories to display
  * @param {string | null} props.selectedSessionId - Currently selected session ID for filtering
  * @param {() => void} props.onClearFilter - Callback function to clear session filter
+ * @param {(storyId: number) => Promise<void>} props.onDeleteStory - Callback function to delete a story
  */
 export function StoriesTab({
   stories,
   selectedSessionId,
   onClearFilter,
+  onDeleteStory,
 }: StoriesTabProps) {
   return (
     <div className="space-y-4">
@@ -39,7 +42,7 @@ export function StoriesTab({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <StoryCard story={story} />
+              <StoryCard story={story} onDeleteStory={onDeleteStory} />
             </motion.div>
           ))
         )}

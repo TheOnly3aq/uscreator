@@ -6,6 +6,7 @@ export interface AdminUserStory {
   action: string | null;
   benefit: string | null;
   background: string | null;
+  additionalInfo: string | null;
   acceptanceCriteria: string[];
   technicalInfo: string[];
   isDraft: boolean;

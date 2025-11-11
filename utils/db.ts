@@ -64,6 +64,7 @@ export async function initializeDatabase(): Promise<void> {
       action VARCHAR(500),
       benefit VARCHAR(500),
       background TEXT,
+      additional_info TEXT,
       acceptance_criteria JSON,
       technical_info JSON,
       is_draft BOOLEAN DEFAULT FALSE,
@@ -100,6 +101,21 @@ export async function initializeDatabase(): Promise<void> {
       await db.execute(`
         ALTER TABLE user_stories 
         ADD COLUMN type VARCHAR(10) DEFAULT 'story'
+      `);
+    }
+  } catch {
+    // Column might already exist, ignore error
+  }
+
+  // Add additional_info column if it doesn't exist (for existing databases)
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'additional_info'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN additional_info TEXT
       `);
     }
   } catch {

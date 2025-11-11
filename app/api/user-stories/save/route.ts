@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
     // Insert new draft
     await db.execute(
       `INSERT INTO user_stories 
-       (session_id, type, role, action, benefit, background, acceptance_criteria, technical_info, is_draft)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)`,
+       (session_id, type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)`,
       [
         sessionId,
         data.type || "story",
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
         data.action || null,
         data.benefit || null,
         data.background || null,
+        data.additionalInfo || null,
         JSON.stringify(data.acceptanceCriteria || []),
         JSON.stringify(data.technicalInfo || []),
       ]

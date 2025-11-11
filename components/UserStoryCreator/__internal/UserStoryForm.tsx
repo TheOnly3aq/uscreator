@@ -215,6 +215,21 @@ export function UserStoryForm({ data, onChange, onTypeChange }: UserStoryFormPro
       )}
 
       <div>
+        <label
+          htmlFor="additionalInfo"
+          className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+        >
+          Additional Information{" "}
+          <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
+        </label>
+        <RichTextEditor
+          value={data.additionalInfo || ""}
+          onChange={(value) => handleChange("additionalInfo", value)}
+          placeholder="Any additional information or notes"
+        />
+      </div>
+
+      <div>
         <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
           Acceptance Criteria{" "}
           <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>

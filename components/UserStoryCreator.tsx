@@ -29,6 +29,7 @@ export function UserStoryCreator() {
     action: "",
     benefit: "",
     background: "",
+    additionalInfo: "",
     acceptanceCriteria: [""],
     technicalInfo: [""],
   });
@@ -38,6 +39,7 @@ export function UserStoryCreator() {
     action: "",
     benefit: "",
     background: "",
+    additionalInfo: "",
     acceptanceCriteria: [""],
     technicalInfo: [""],
   });
@@ -83,6 +85,7 @@ export function UserStoryCreator() {
             action: "",
             benefit: "",
             background: "",
+            additionalInfo: "",
             acceptanceCriteria: [""],
             technicalInfo: [""],
           });
@@ -97,6 +100,7 @@ export function UserStoryCreator() {
             action: "",
             benefit: "",
             background: "",
+            additionalInfo: "",
             acceptanceCriteria: [""],
             technicalInfo: [""],
           });
@@ -130,6 +134,7 @@ export function UserStoryCreator() {
       data.action.trim() ||
       data.benefit.trim() ||
       data.background?.trim() ||
+      data.additionalInfo?.trim() ||
       data.acceptanceCriteria.some((c) => c.trim()) ||
       data.technicalInfo.some((t) => t.trim());
 
@@ -195,6 +200,7 @@ export function UserStoryCreator() {
       currentData.action.trim() ||
       currentData.benefit.trim() ||
       currentData.background?.trim() ||
+      currentData.additionalInfo?.trim() ||
       currentData.acceptanceCriteria.some((c) => c.trim()) ||
       currentData.technicalInfo.some((t) => t.trim());
 
@@ -234,6 +240,7 @@ export function UserStoryCreator() {
           action: "",
           benefit: "",
           background: "",
+          additionalInfo: "",
           acceptanceCriteria: [""],
           technicalInfo: [""],
         };
@@ -265,6 +272,7 @@ export function UserStoryCreator() {
       action: "",
       benefit: "",
       background: "",
+      additionalInfo: "",
       acceptanceCriteria: [""],
       technicalInfo: [""],
     };
@@ -286,6 +294,7 @@ export function UserStoryCreator() {
       userStoryData.action.trim() ||
       userStoryData.benefit.trim() ||
       userStoryData.background?.trim() ||
+      userStoryData.additionalInfo?.trim() ||
       userStoryData.acceptanceCriteria.some((c) => c.trim()) ||
       userStoryData.technicalInfo.some((t) => t.trim());
 

@@ -9,6 +9,7 @@ interface UserStoryRecord extends RowDataPacket {
   action: string;
   benefit: string;
   background: string | null;
+  additional_info: string | null;
   acceptance_criteria: string;
   technical_info: string;
 }
@@ -34,14 +35,14 @@ export async function GET(request: NextRequest) {
     let params: (string | undefined)[];
 
     if (type) {
-      query = `SELECT type, role, action, benefit, background, acceptance_criteria, technical_info
+      query = `SELECT type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info
                FROM user_stories
                WHERE session_id = ? AND is_draft = TRUE AND type = ?
                ORDER BY updated_at DESC
                LIMIT 1`;
       params = [sessionId, type];
     } else {
-      query = `SELECT type, role, action, benefit, background, acceptance_criteria, technical_info
+      query = `SELECT type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info
                FROM user_stories
                WHERE session_id = ? AND is_draft = TRUE
                ORDER BY updated_at DESC
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
       action: row.action || "",
       benefit: row.benefit || "",
       background: row.background || "",
+      additionalInfo: row.additional_info || "",
       acceptanceCriteria:
         typeof row.acceptance_criteria === "string"
           ? JSON.parse(row.acceptance_criteria)

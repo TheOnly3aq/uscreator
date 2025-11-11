@@ -71,6 +71,16 @@ export function formatUserStory(data: UserStoryData): string {
     }
   }
 
+  if (data.additionalInfo && data.additionalInfo.trim()) {
+    const additionalInfoMarkdown = htmlToMarkdown(data.additionalInfo);
+    if (additionalInfoMarkdown) {
+      parts.push('**Additional Information:**');
+      parts.push('');
+      parts.push(additionalInfoMarkdown);
+      parts.push('');
+    }
+  }
+
   if (data.acceptanceCriteria && data.acceptanceCriteria.length > 0) {
     const validCriteria = data.acceptanceCriteria.filter(
       (item) => item && item.trim()

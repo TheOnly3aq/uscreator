@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
     // Insert new history entry
     await db.execute(
       `INSERT INTO user_stories 
-       (session_id, type, role, action, benefit, background, acceptance_criteria, technical_info, is_draft)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, FALSE)`,
+       (session_id, type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE)`,
       [
         sessionId,
         data.type || "story",
@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
         data.action || null,
         data.benefit || null,
         data.background || null,
+        data.additionalInfo || null,
         JSON.stringify(data.acceptanceCriteria || []),
         JSON.stringify(data.technicalInfo || []),
       ]

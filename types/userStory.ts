@@ -4,6 +4,7 @@ export interface UserStoryData {
   action: string;
   benefit: string;
   background?: string;
+  additionalInfo?: string;
   acceptanceCriteria: string[];
   technicalInfo: string[];
 }

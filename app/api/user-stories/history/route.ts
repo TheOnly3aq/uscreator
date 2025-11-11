@@ -10,6 +10,7 @@ interface UserStoryRecord extends RowDataPacket {
   action: string;
   benefit: string;
   background: string | null;
+  additional_info: string | null;
   acceptance_criteria: string;
   technical_info: string;
   created_at: Date;
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     const db = getPool();
     const [rows] = await db.execute<UserStoryRecord[]>(
-      `SELECT id, type, role, action, benefit, background, acceptance_criteria, technical_info, created_at, updated_at
+      `SELECT id, type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, created_at, updated_at
        FROM user_stories
        WHERE session_id = ? AND is_draft = FALSE
        ORDER BY created_at DESC
@@ -46,6 +47,7 @@ export async function GET(request: NextRequest) {
         action: row.action || "",
         benefit: row.benefit || "",
         background: row.background || "",
+        additionalInfo: row.additional_info || "",
         acceptanceCriteria:
           typeof row.acceptance_criteria === "string"
             ? JSON.parse(row.acceptance_criteria)

@@ -42,6 +42,15 @@ export function StoryCard({ story, onDeleteStory }: StoryCardProps) {
             <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
               ID: {story.id}
             </span>
+            <span
+              className={`px-2 py-1 rounded text-xs font-medium ${
+                story.type === "bug"
+                  ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                  : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+              }`}
+            >
+              {story.type === "bug" ? "Bug" : "Story"}
+            </span>
             {story.isDraft && (
               <span className="px-2 py-1 text-xs rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200">
                 Draft

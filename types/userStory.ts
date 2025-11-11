@@ -1,4 +1,5 @@
 export interface UserStoryData {
+  type: "story" | "bug";
   role: string;
   action: string;
   benefit: string;

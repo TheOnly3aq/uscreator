@@ -51,10 +51,11 @@ export async function POST(request: NextRequest) {
     // Insert new history entry
     await db.execute(
       `INSERT INTO user_stories 
-       (session_id, role, action, benefit, background, acceptance_criteria, technical_info, is_draft)
-       VALUES (?, ?, ?, ?, ?, ?, ?, FALSE)`,
+       (session_id, type, role, action, benefit, background, acceptance_criteria, technical_info, is_draft)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, FALSE)`,
       [
         sessionId,
+        data.type || "story",
         data.role || null,
         data.action || null,
         data.benefit || null,

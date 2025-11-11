@@ -1,6 +1,7 @@
 export interface AdminUserStory {
   id: number;
   sessionId: string;
+  type: "story" | "bug";
   role: string | null;
   action: string | null;
   benefit: string | null;

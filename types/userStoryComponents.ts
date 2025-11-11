@@ -9,6 +9,7 @@ export interface RichTextEditorProps {
 export interface UserStoryFormProps {
   data: UserStoryData;
   onChange: (data: UserStoryData) => void;
+  onTypeChange?: (type: "story" | "bug") => void;
 }
 
 export interface UserStoryPreviewProps {

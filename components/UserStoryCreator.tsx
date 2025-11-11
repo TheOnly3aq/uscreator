@@ -22,7 +22,18 @@ import { History } from "./UserStoryCreator/__internal/History";
 export function UserStoryCreator() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<"form" | "history">("form");
-  const [userStoryData, setUserStoryData] = useState<UserStoryData>({
+  const [currentType, setCurrentType] = useState<"story" | "bug">("story");
+  const [storyData, setStoryData] = useState<UserStoryData>({
+    type: "story",
+    role: "",
+    action: "",
+    benefit: "",
+    background: "",
+    acceptanceCriteria: [""],
+    technicalInfo: [""],
+  });
+  const [bugData, setBugData] = useState<UserStoryData>({
+    type: "bug",
     role: "",
     action: "",
     benefit: "",
@@ -33,6 +44,9 @@ export function UserStoryCreator() {
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasInitializedRef = useRef(false);
+  const isTypeChangingRef = useRef(false);
+
+  const userStoryData = currentType === "story" ? storyData : bugData;
 
   useEffect(() => {
     const initializeSession = async () => {
@@ -46,11 +60,48 @@ export function UserStoryCreator() {
           }
         }
 
-        const latestResponse = await fetch("/api/user-stories/latest/");
-        const { data } = await latestResponse.json();
-        if (data) {
-          setUserStoryData(data);
+        // Load saved type preference
+        const savedType = localStorage.getItem("userstory_selected_type");
+        const initialType = (savedType === "bug" || savedType === "story") ? savedType : "story";
+        setCurrentType(initialType);
+
+        // Load drafts for both types
+        const [storyResponse, bugResponse] = await Promise.all([
+          fetch("/api/user-stories/latest/?type=story"),
+          fetch("/api/user-stories/latest/?type=bug"),
+        ]);
+
+        const storyResult = await storyResponse.json();
+        const bugResult = await bugResponse.json();
+
+        if (storyResult.data) {
+          setStoryData(storyResult.data);
+        } else {
+          setStoryData({
+            type: "story",
+            role: "",
+            action: "",
+            benefit: "",
+            background: "",
+            acceptanceCriteria: [""],
+            technicalInfo: [""],
+          });
         }
+
+        if (bugResult.data) {
+          setBugData(bugResult.data);
+        } else {
+          setBugData({
+            type: "bug",
+            role: "",
+            action: "",
+            benefit: "",
+            background: "",
+            acceptanceCriteria: [""],
+            technicalInfo: [""],
+          });
+        }
+
         hasInitializedRef.current = true;
       } catch (error) {
         console.error("Error initializing session:", error);
@@ -103,7 +154,7 @@ export function UserStoryCreator() {
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated || !hasInitializedRef.current) {
+    if (!isAuthenticated || !hasInitializedRef.current || isTypeChangingRef.current) {
       return;
     }
 
@@ -123,8 +174,81 @@ export function UserStoryCreator() {
   }, [userStoryData, isAuthenticated, saveUserStory]);
 
   const handleDataChange = useCallback((data: UserStoryData) => {
-    setUserStoryData(data);
+    if (data.type === "story") {
+      setStoryData(data);
+    } else {
+      setBugData(data);
+    }
   }, []);
+
+  const handleTypeChange = useCallback(async (newType: "story" | "bug") => {
+    if (newType === currentType) {
+      return;
+    }
+
+    isTypeChangingRef.current = true;
+
+    // Save current draft before switching
+    const currentData = currentType === "story" ? storyData : bugData;
+    const hasContent =
+      currentData.role.trim() ||
+      currentData.action.trim() ||
+      currentData.benefit.trim() ||
+      currentData.background?.trim() ||
+      currentData.acceptanceCriteria.some((c) => c.trim()) ||
+      currentData.technicalInfo.some((t) => t.trim());
+
+    if (hasContent) {
+      try {
+        await fetch("/api/user-stories/save/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(currentData),
+        });
+      } catch (error) {
+        console.error("Error saving draft before type change:", error);
+      }
+    }
+
+    // Switch type and load the draft for the new type
+    setCurrentType(newType);
+    localStorage.setItem("userstory_selected_type", newType);
+
+    // Load draft for new type
+    try {
+      const response = await fetch(`/api/user-stories/latest/?type=${newType}`);
+      const { data } = await response.json();
+      if (data) {
+        if (newType === "story") {
+          setStoryData(data);
+        } else {
+          setBugData(data);
+        }
+      } else {
+        // Initialize empty data for new type if no draft exists
+        const emptyData: UserStoryData = {
+          type: newType,
+          role: "",
+          action: "",
+          benefit: "",
+          background: "",
+          acceptanceCriteria: [""],
+          technicalInfo: [""],
+        };
+        if (newType === "story") {
+          setStoryData(emptyData);
+        } else {
+          setBugData(emptyData);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading draft for new type:", error);
+    }
+
+    isTypeChangingRef.current = false;
+  }, [currentType, storyData, bugData]);
 
   const handleClear = useCallback(async () => {
     try {
@@ -135,19 +259,26 @@ export function UserStoryCreator() {
       console.error("Error clearing user stories:", error);
     }
 
-    setUserStoryData({
+    const emptyData: UserStoryData = {
+      type: currentType,
       role: "",
       action: "",
       benefit: "",
       background: "",
       acceptanceCriteria: [""],
       technicalInfo: [""],
-    });
+    };
+
+    if (currentType === "story") {
+      setStoryData(emptyData);
+    } else {
+      setBugData(emptyData);
+    }
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
-  }, []);
+  }, [currentType]);
 
   const handleSaveToHistory = useCallback(async () => {
     const hasContent =
@@ -176,7 +307,13 @@ export function UserStoryCreator() {
   }, [userStoryData]);
 
   const handleLoadStory = useCallback((data: UserStoryData) => {
-    setUserStoryData(data);
+    if (data.type === "story") {
+      setStoryData(data);
+    } else {
+      setBugData(data);
+    }
+    setCurrentType(data.type);
+    localStorage.setItem("userstory_selected_type", data.type);
     setActiveTab("form");
     localStorage.setItem("userstory_active_tab", "form");
   }, []);
@@ -251,7 +388,11 @@ export function UserStoryCreator() {
               <h2 className="text-xl font-semibold mb-6 text-zinc-900 dark:text-zinc-100">
                 Form
               </h2>
-              <UserStoryForm data={userStoryData} onChange={handleDataChange} />
+              <UserStoryForm
+                data={userStoryData}
+                onChange={handleDataChange}
+                onTypeChange={handleTypeChange}
+              />
             </motion.div>
 
             <motion.div

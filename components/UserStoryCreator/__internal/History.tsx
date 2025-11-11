@@ -148,8 +148,19 @@ export function History({ onLoadStory }: HistoryProps) {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <div className="text-sm text-zinc-500 dark:text-zinc-400 mb-2">
-                    Updated: {formatDate(item.updatedAt)}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        item.data.type === "bug"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                          : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                      }`}
+                    >
+                      {item.data.type === "bug" ? "Bug" : "Story"}
+                    </span>
+                    <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                      Updated: {formatDate(item.updatedAt)}
+                    </div>
                   </div>
                   <div className="text-xs text-zinc-500 dark:text-zinc-400">
                     Created: {formatDate(item.createdAt)}

@@ -59,6 +59,7 @@ export async function initializeDatabase(): Promise<void> {
     CREATE TABLE IF NOT EXISTS user_stories (
       id INT AUTO_INCREMENT PRIMARY KEY,
       session_id VARCHAR(255) NOT NULL,
+      type VARCHAR(10) DEFAULT 'story',
       role VARCHAR(500),
       action VARCHAR(500),
       benefit VARCHAR(500),
@@ -70,6 +71,7 @@ export async function initializeDatabase(): Promise<void> {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_session_id (session_id),
       INDEX idx_session_draft (session_id, is_draft),
+      INDEX idx_session_draft_type (session_id, is_draft, type),
       INDEX idx_created_at (created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
@@ -83,6 +85,21 @@ export async function initializeDatabase(): Promise<void> {
       await db.execute(`
         ALTER TABLE user_stories 
         ADD COLUMN is_draft BOOLEAN DEFAULT FALSE
+      `);
+    }
+  } catch {
+    // Column might already exist, ignore error
+  }
+
+  // Add type column if it doesn't exist (for existing databases)
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'type'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN type VARCHAR(10) DEFAULT 'story'
       `);
     }
   } catch {

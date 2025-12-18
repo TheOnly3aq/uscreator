@@ -17,6 +17,7 @@ The application provides a live preview of the formatted user story and allows y
 - Password-protected access
 - Live preview of formatted user story
 - One-click copy to clipboard
+- AI-powered user story and bug report generation using OpenRouter
 - Dark mode support
 - Clean, modern interface with smooth animations
 - Responsive design
@@ -59,11 +60,15 @@ pnpm i
 cp .env.example .env
 ```
 
-4. Set your password in `.env`:
+4. Set your configuration in `.env`:
 
 ```
 PASSWORD=your-secure-password-here
+OPENROUTER_API_KEY=your-openrouter-api-key-here
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Note:** To use the AI Creation feature, you'll need an OpenRouter API key. Sign up at [openrouter.ai](https://openrouter.ai) to get your API key.
 
 5. Run the development server:
 

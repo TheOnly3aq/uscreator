@@ -14,6 +14,7 @@ import { PasswordGate } from "./UserStoryCreator/__internal/PasswordGate";
 import { UserStoryForm } from "./UserStoryCreator/__internal/UserStoryForm";
 import { UserStoryPreview } from "./UserStoryCreator/__internal/UserStoryPreview";
 import { History } from "./UserStoryCreator/__internal/History";
+import { AICreation } from "./UserStoryCreator/__internal/AICreation";
 
 /**
  * Main user story creator component that manages authentication, form state, and user story creation
@@ -21,7 +22,7 @@ import { History } from "./UserStoryCreator/__internal/History";
  */
 export function UserStoryCreator() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<"form" | "history">("form");
+  const [activeTab, setActiveTab] = useState<"form" | "history" | "ai">("form");
   const [currentType, setCurrentType] = useState<"story" | "bug">("story");
   const [storyData, setStoryData] = useState<UserStoryData>({
     type: "story",
@@ -64,7 +65,8 @@ export function UserStoryCreator() {
 
         // Load saved type preference
         const savedType = localStorage.getItem("userstory_selected_type");
-        const initialType = (savedType === "bug" || savedType === "story") ? savedType : "story";
+        const initialType =
+          savedType === "bug" || savedType === "story" ? savedType : "story";
         setCurrentType(initialType);
 
         // Load drafts for both types
@@ -118,8 +120,11 @@ export function UserStoryCreator() {
       startTransition(() => {
         setIsAuthenticated(true);
         const savedTab = localStorage.getItem("userstory_active_tab");
-        if (savedTab && (savedTab === "form" || savedTab === "history")) {
-          setActiveTab(savedTab as "form" | "history");
+        if (
+          savedTab &&
+          (savedTab === "form" || savedTab === "history" || savedTab === "ai")
+        ) {
+          setActiveTab(savedTab as "form" | "history" | "ai");
         }
       });
       if (!hasInitializedRef.current) {
@@ -159,7 +164,11 @@ export function UserStoryCreator() {
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated || !hasInitializedRef.current || isTypeChangingRef.current) {
+    if (
+      !isAuthenticated ||
+      !hasInitializedRef.current ||
+      isTypeChangingRef.current
+    ) {
       return;
     }
 
@@ -186,76 +195,81 @@ export function UserStoryCreator() {
     }
   }, []);
 
-  const handleTypeChange = useCallback(async (newType: "story" | "bug") => {
-    if (newType === currentType) {
-      return;
-    }
+  const handleTypeChange = useCallback(
+    async (newType: "story" | "bug") => {
+      if (newType === currentType) {
+        return;
+      }
 
-    isTypeChangingRef.current = true;
+      isTypeChangingRef.current = true;
 
-    // Save current draft before switching
-    const currentData = currentType === "story" ? storyData : bugData;
-    const hasContent =
-      currentData.role.trim() ||
-      currentData.action.trim() ||
-      currentData.benefit.trim() ||
-      currentData.background?.trim() ||
-      currentData.additionalInfo?.trim() ||
-      currentData.acceptanceCriteria.some((c) => c.trim()) ||
-      currentData.technicalInfo.some((t) => t.trim());
+      // Save current draft before switching
+      const currentData = currentType === "story" ? storyData : bugData;
+      const hasContent =
+        currentData.role.trim() ||
+        currentData.action.trim() ||
+        currentData.benefit.trim() ||
+        currentData.background?.trim() ||
+        currentData.additionalInfo?.trim() ||
+        currentData.acceptanceCriteria.some((c) => c.trim()) ||
+        currentData.technicalInfo.some((t) => t.trim());
 
-    if (hasContent) {
+      if (hasContent) {
+        try {
+          await fetch("/api/user-stories/save/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(currentData),
+          });
+        } catch (error) {
+          console.error("Error saving draft before type change:", error);
+        }
+      }
+
+      // Switch type and load the draft for the new type
+      setCurrentType(newType);
+      localStorage.setItem("userstory_selected_type", newType);
+
+      // Load draft for new type
       try {
-        await fetch("/api/user-stories/save/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(currentData),
-        });
+        const response = await fetch(
+          `/api/user-stories/latest/?type=${newType}`
+        );
+        const { data } = await response.json();
+        if (data) {
+          if (newType === "story") {
+            setStoryData(data);
+          } else {
+            setBugData(data);
+          }
+        } else {
+          // Initialize empty data for new type if no draft exists
+          const emptyData: UserStoryData = {
+            type: newType,
+            role: "",
+            action: "",
+            benefit: "",
+            background: "",
+            additionalInfo: "",
+            acceptanceCriteria: [""],
+            technicalInfo: [""],
+          };
+          if (newType === "story") {
+            setStoryData(emptyData);
+          } else {
+            setBugData(emptyData);
+          }
+        }
       } catch (error) {
-        console.error("Error saving draft before type change:", error);
+        console.error("Error loading draft for new type:", error);
       }
-    }
 
-    // Switch type and load the draft for the new type
-    setCurrentType(newType);
-    localStorage.setItem("userstory_selected_type", newType);
-
-    // Load draft for new type
-    try {
-      const response = await fetch(`/api/user-stories/latest/?type=${newType}`);
-      const { data } = await response.json();
-      if (data) {
-        if (newType === "story") {
-          setStoryData(data);
-        } else {
-          setBugData(data);
-        }
-      } else {
-        // Initialize empty data for new type if no draft exists
-        const emptyData: UserStoryData = {
-          type: newType,
-          role: "",
-          action: "",
-          benefit: "",
-          background: "",
-          additionalInfo: "",
-          acceptanceCriteria: [""],
-          technicalInfo: [""],
-        };
-        if (newType === "story") {
-          setStoryData(emptyData);
-        } else {
-          setBugData(emptyData);
-        }
-      }
-    } catch (error) {
-      console.error("Error loading draft for new type:", error);
-    }
-
-    isTypeChangingRef.current = false;
-  }, [currentType, storyData, bugData]);
+      isTypeChangingRef.current = false;
+    },
+    [currentType, storyData, bugData]
+  );
 
   const handleClear = useCallback(async () => {
     try {
@@ -327,6 +341,18 @@ export function UserStoryCreator() {
     localStorage.setItem("userstory_active_tab", "form");
   }, []);
 
+  const handleAIGenerate = useCallback((data: UserStoryData) => {
+    if (data.type === "story") {
+      setStoryData(data);
+    } else {
+      setBugData(data);
+    }
+    setCurrentType(data.type);
+    localStorage.setItem("userstory_selected_type", data.type);
+    setActiveTab("form");
+    localStorage.setItem("userstory_active_tab", "form");
+  }, []);
+
   if (!isAuthenticated) {
     return <PasswordGate onAuthenticated={() => setIsAuthenticated(true)} />;
   }
@@ -369,6 +395,23 @@ export function UserStoryCreator() {
             }`}
           >
             Form
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("ai");
+              localStorage.setItem("userstory_active_tab", "ai");
+            }}
+            className={`px-4 py-2 font-medium transition-colors relative ${
+              activeTab === "ai"
+                ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
+                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+            }`}
+          >
+            AI Creation
+            <span className="absolute -top-1 -right-1 text-[10px] font-bold px-1.5 py-0.5 bg-blue-500 text-white rounded transform rotate-12">
+              NEW
+            </span>
           </button>
           <button
             type="button"
@@ -417,6 +460,15 @@ export function UserStoryCreator() {
               />
             </motion.div>
           </div>
+        ) : activeTab === "ai" ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
+          >
+            <AICreation onGenerate={handleAIGenerate} />
+          </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

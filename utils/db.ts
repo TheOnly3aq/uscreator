@@ -148,5 +148,20 @@ export async function initializeDatabase(): Promise<void> {
   } catch {
     // Column might already exist, ignore error
   }
+
+  // Add ai_prompt column if it doesn't exist (for existing databases)
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM sessions LIKE 'ai_prompt'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE sessions 
+        ADD COLUMN ai_prompt TEXT
+      `);
+    }
+  } catch {
+    // Column might already exist, ignore error
+  }
 }
 

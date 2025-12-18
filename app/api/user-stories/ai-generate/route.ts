@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Create system prompt with clear instructions
     const systemPrompt = type === "story" 
-      ? `You are an expert at creating user stories. Generate a user story based on the user's prompt. Return ONLY a valid JSON object with the following structure:
+      ? `You are an expert at creating user stories. Generate a user story based STRICTLY on the user's prompt. Return ONLY a valid JSON object with the following structure:
 {
   "role": "string - the user role (e.g., 'user', 'admin', 'developer')",
   "action": "string - what the user wants to do (e.g., 'to save my preferences')",
@@ -43,12 +43,15 @@ export async function POST(request: NextRequest) {
   "technicalInfo": ["array of strings - optional technical information"]
 }
 
-Important:
-- Fill in role, action, and benefit based on the user's prompt
-- If the prompt doesn't provide enough information, make reasonable assumptions
-- Keep acceptanceCriteria and technicalInfo as arrays (can be empty arrays)
+CRITICAL RULES - YOU MUST FOLLOW THESE STRICTLY:
+- ONLY use information that is explicitly stated or clearly implied in the user's prompt
+- DO NOT add details, features, or information that are not mentioned in the user's prompt
+- DO NOT make assumptions or invent details that aren't in the prompt
+- If the prompt doesn't provide information for a field, leave it as an empty string or empty array
+- Keep the output minimal and focused - only extract what is actually in the prompt
+- For acceptanceCriteria and technicalInfo: only include items if they are explicitly mentioned in the prompt, otherwise use empty arrays []
 - Return ONLY the JSON object, no additional text or markdown formatting`
-      : `You are an expert at creating bug reports. Generate a bug report based on the user's prompt. Return ONLY a valid JSON object with the following structure:
+      : `You are an expert at creating bug reports. Generate a bug report based STRICTLY on the user's prompt. Return ONLY a valid JSON object with the following structure:
 {
   "role": "string - the bug title/description (e.g., 'Users should be able to select the disabled filter without being redirected')",
   "action": "string - the scenario/steps to reproduce (can be markdown formatted with bullet points)",
@@ -59,14 +62,21 @@ Important:
   "technicalInfo": ["array of strings - optional technical information"]
 }
 
-Important:
-- Fill in role (title), action (scenario/steps), benefit (expected result), and background (actual result) based on the user's prompt
-- If the prompt doesn't provide enough information, make reasonable assumptions
-- The action field can contain markdown-formatted steps (e.g., "- Step 1\\n- Step 2")
-- Keep acceptanceCriteria and technicalInfo as arrays (can be empty arrays)
+CRITICAL RULES - YOU MUST FOLLOW THESE STRICTLY:
+- ONLY use information that is explicitly stated or clearly implied in the user's prompt
+- DO NOT add details, features, or information that are not mentioned in the user's prompt
+- DO NOT make assumptions or invent details that aren't in the prompt
+- If the prompt doesn't provide information for a field, leave it as an empty string or empty array
+- Keep the output minimal and focused - only extract what is actually in the prompt
+- The action field can contain markdown-formatted steps (e.g., "- Step 1\\n- Step 2") ONLY if steps are provided in the prompt
+- For acceptanceCriteria and technicalInfo: only include items if they are explicitly mentioned in the prompt, otherwise use empty arrays []
 - Return ONLY the JSON object, no additional text or markdown formatting`;
 
-    const userPrompt = `Create a ${type === "story" ? "user story" : "bug report"} based on this: ${prompt}`;
+    const userPrompt = `Create a ${type === "story" ? "user story" : "bug report"} based STRICTLY on the following information. Do NOT add any details, features, or information that are not explicitly mentioned here:
+
+${prompt}
+
+Remember: Only extract and use information that is actually provided above. Leave fields empty if the information is not present.`;
 
     // Call OpenRouter API
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -78,7 +88,7 @@ Important:
         "X-Title": "User Story Creator",
       },
       body: JSON.stringify({
-        model: "anthropic/claude-3.5-sonnet",
+        model: "anthropic/claude-haiku-4.5",
         messages: [
           {
             role: "system",
@@ -89,7 +99,7 @@ Important:
             content: userPrompt,
           },
         ],
-        temperature: 0.7,
+        temperature: 0.3,
         max_tokens: 2000,
       }),
     });

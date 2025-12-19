@@ -67,13 +67,11 @@ export function UserStoryCreator() {
           }
         }
 
-        // Load saved type preference
         const savedType = localStorage.getItem("userstory_selected_type");
         const initialType =
           savedType === "bug" || savedType === "story" ? savedType : "story";
         setCurrentType(initialType);
 
-        // Load drafts for both types
         const [storyResponse, bugResponse] = await Promise.all([
           fetch("/api/user-stories/latest/?type=story"),
           fetch("/api/user-stories/latest/?type=bug"),

@@ -33,10 +33,8 @@ export function AICreation({ onGenerate }: AICreationProps) {
     const trimmed = promptText.trim();
     if (!trimmed) return true;
 
-    // Count words (split by whitespace and filter out empty strings)
     const words = trimmed.split(/\s+/).filter((word) => word.length > 0);
 
-    // Consider prompt too thin if less than 10 words
     return words.length < 10;
   };
 
@@ -46,13 +44,11 @@ export function AICreation({ onGenerate }: AICreationProps) {
       return;
     }
 
-    // Check if prompt is too thin (unless bypassing)
     if (!bypassValidation && isPromptTooThin(prompt)) {
       setShowThinPromptModal(true);
       return;
     }
 
-    // Close modal if it's open
     if (showThinPromptModal) {
       setShowThinPromptModal(false);
     }
@@ -116,7 +112,6 @@ export function AICreation({ onGenerate }: AICreationProps) {
     loadPrompt();
   }, []);
 
-  // Save prompt to session when it changes (debounced)
   useEffect(() => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -143,7 +138,6 @@ export function AICreation({ onGenerate }: AICreationProps) {
     };
   }, [prompt]);
 
-  // Handle clearing the prompt
   const handleClearPrompt = async () => {
     setIsClearing(true);
     try {
@@ -164,7 +158,6 @@ export function AICreation({ onGenerate }: AICreationProps) {
     }
   };
 
-  // Handle Escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && showThinPromptModal) {
@@ -174,7 +167,6 @@ export function AICreation({ onGenerate }: AICreationProps) {
 
     if (showThinPromptModal) {
       document.addEventListener("keydown", handleEscape);
-      // Focus the modal when it opens
       setTimeout(() => {
         modalRef.current?.focus();
       }, 100);
@@ -273,11 +265,9 @@ export function AICreation({ onGenerate }: AICreationProps) {
           : `Generate ${type === "story" ? "User Story" : "Bug Report"}`}
       </button>
 
-      {/* Thin Prompt Modal */}
       <AnimatePresence>
         {showThinPromptModal && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -286,7 +276,6 @@ export function AICreation({ onGenerate }: AICreationProps) {
               className="fixed inset-0 bg-black/50 z-40"
               aria-hidden="true"
             />
-            {/* Modal */}
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
               <motion.div
                 ref={modalRef}

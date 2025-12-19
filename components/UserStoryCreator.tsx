@@ -10,6 +10,10 @@ import {
 import { motion } from "framer-motion";
 import { UserStoryData } from "@/types/userStory";
 import { getCookie, setSessionId, getSessionId } from "@/utils/cookies";
+import {
+  hasUserStoryContent,
+  createEmptyUserStoryData,
+} from "@/utils/userStoryHelpers";
 import { PasswordGate } from "./UserStoryCreator/__internal/PasswordGate";
 import { UserStoryForm } from "./UserStoryCreator/__internal/UserStoryForm";
 import { UserStoryPreview } from "./UserStoryCreator/__internal/UserStoryPreview";
@@ -81,31 +85,13 @@ export function UserStoryCreator() {
         if (storyResult.data) {
           setStoryData(storyResult.data);
         } else {
-          setStoryData({
-            type: "story",
-            role: "",
-            action: "",
-            benefit: "",
-            background: "",
-            additionalInfo: "",
-            acceptanceCriteria: [""],
-            technicalInfo: [""],
-          });
+          setStoryData(createEmptyUserStoryData("story"));
         }
 
         if (bugResult.data) {
           setBugData(bugResult.data);
         } else {
-          setBugData({
-            type: "bug",
-            role: "",
-            action: "",
-            benefit: "",
-            background: "",
-            additionalInfo: "",
-            acceptanceCriteria: [""],
-            technicalInfo: [""],
-          });
+          setBugData(createEmptyUserStoryData("bug"));
         }
 
         hasInitializedRef.current = true;
@@ -134,16 +120,7 @@ export function UserStoryCreator() {
   }, []);
 
   const saveUserStory = useCallback(async (data: UserStoryData) => {
-    const hasContent =
-      data.role.trim() ||
-      data.action.trim() ||
-      data.benefit.trim() ||
-      data.background?.trim() ||
-      data.additionalInfo?.trim() ||
-      data.acceptanceCriteria.some((c) => c.trim()) ||
-      data.technicalInfo.some((t) => t.trim());
-
-    if (!hasContent) {
+    if (!hasUserStoryContent(data)) {
       return;
     }
 
@@ -203,18 +180,9 @@ export function UserStoryCreator() {
 
       isTypeChangingRef.current = true;
 
-      // Save current draft before switching
       const currentData = currentType === "story" ? storyData : bugData;
-      const hasContent =
-        currentData.role.trim() ||
-        currentData.action.trim() ||
-        currentData.benefit.trim() ||
-        currentData.background?.trim() ||
-        currentData.additionalInfo?.trim() ||
-        currentData.acceptanceCriteria.some((c) => c.trim()) ||
-        currentData.technicalInfo.some((t) => t.trim());
 
-      if (hasContent) {
+      if (hasUserStoryContent(currentData)) {
         try {
           await fetch("/api/user-stories/save/", {
             method: "POST",
@@ -228,11 +196,9 @@ export function UserStoryCreator() {
         }
       }
 
-      // Switch type and load the draft for the new type
       setCurrentType(newType);
       localStorage.setItem("userstory_selected_type", newType);
 
-      // Load draft for new type
       try {
         const response = await fetch(
           `/api/user-stories/latest/?type=${newType}`
@@ -245,17 +211,7 @@ export function UserStoryCreator() {
             setBugData(data);
           }
         } else {
-          // Initialize empty data for new type if no draft exists
-          const emptyData: UserStoryData = {
-            type: newType,
-            role: "",
-            action: "",
-            benefit: "",
-            background: "",
-            additionalInfo: "",
-            acceptanceCriteria: [""],
-            technicalInfo: [""],
-          };
+          const emptyData = createEmptyUserStoryData(newType);
           if (newType === "story") {
             setStoryData(emptyData);
           } else {
@@ -280,16 +236,7 @@ export function UserStoryCreator() {
       console.error("Error clearing user stories:", error);
     }
 
-    const emptyData: UserStoryData = {
-      type: currentType,
-      role: "",
-      action: "",
-      benefit: "",
-      background: "",
-      additionalInfo: "",
-      acceptanceCriteria: [""],
-      technicalInfo: [""],
-    };
+    const emptyData = createEmptyUserStoryData(currentType);
 
     if (currentType === "story") {
       setStoryData(emptyData);
@@ -303,16 +250,7 @@ export function UserStoryCreator() {
   }, [currentType]);
 
   const handleSaveToHistory = useCallback(async () => {
-    const hasContent =
-      userStoryData.role.trim() ||
-      userStoryData.action.trim() ||
-      userStoryData.benefit.trim() ||
-      userStoryData.background?.trim() ||
-      userStoryData.additionalInfo?.trim() ||
-      userStoryData.acceptanceCriteria.some((c) => c.trim()) ||
-      userStoryData.technicalInfo.some((t) => t.trim());
-
-    if (!hasContent) {
+    if (!hasUserStoryContent(userStoryData)) {
       return;
     }
 

@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create system prompt with clear instructions
     const systemPrompt = type === "story" 
       ? `You are an expert at creating user stories. Generate a user story based STRICTLY on the user's prompt. Return ONLY a valid JSON object with the following structure:
 {
@@ -78,7 +77,6 @@ ${prompt}
 
 Remember: Only extract and use information that is actually provided above. Leave fields empty if the information is not present.`;
 
-    // Call OpenRouter API
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -123,24 +121,21 @@ Remember: Only extract and use information that is actually provided above. Leav
       );
     }
 
-    // Parse the JSON response
     let parsedData: Partial<UserStoryData>;
     try {
-      // Remove any markdown code blocks if present
       const cleanedContent = content
         .replace(/```json\n?/g, "")
         .replace(/```\n?/g, "")
         .trim();
       parsedData = JSON.parse(cleanedContent);
     } catch (parseError) {
-      console.error("Failed to parse AI response:", content);
+      console.error("Failed to parse AI response:", content, parseError);
       return NextResponse.json(
         { error: "Failed to parse AI response" },
         { status: 500 }
       );
     }
 
-    // Validate and format the response
     const userStoryData: UserStoryData = {
       type,
       role: parsedData.role || "",

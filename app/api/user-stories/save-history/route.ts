@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
     const data: UserStoryData = await request.json();
     const db = getPool();
 
-    // Count existing history items
     const [countRows] = await db.execute<RowDataPacket[]>(
       `SELECT COUNT(*) as count FROM user_stories 
        WHERE session_id = ? AND is_draft = FALSE`,
@@ -31,7 +30,6 @@ export async function POST(request: NextRequest) {
 
     const count = (countRows[0] as { count: number })?.count || 0;
 
-    // If we have 10 or more, delete the oldest ones
     if (count >= 10) {
       const deleteCount = count - 9;
       await db.execute(
@@ -48,7 +46,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert new history entry
     await db.execute(
       `INSERT INTO user_stories 
        (session_id, type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft)

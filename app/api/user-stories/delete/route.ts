@@ -28,7 +28,6 @@ export async function DELETE(request: NextRequest) {
 
     const db = getPool();
 
-    // Delete only if it belongs to the current session
     const [result] = await db.execute(
       `DELETE FROM user_stories 
        WHERE id = ? AND session_id = ?`,

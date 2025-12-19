@@ -20,13 +20,11 @@ export async function POST(request: NextRequest) {
     const data: UserStoryData = await request.json();
     const db = getPool();
 
-    // Delete existing draft for this session and type
     await db.execute(
       `DELETE FROM user_stories WHERE session_id = ? AND is_draft = TRUE AND type = ?`,
       [sessionId, data.type || "story"]
     );
 
-    // Insert new draft
     await db.execute(
       `INSERT INTO user_stories 
        (session_id, type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft)

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { UserStoryPreviewProps } from "@/types/userStoryComponents";
-import { UserStoryData } from "@/types/userStory";
 import { formatUserStory } from "@/utils/userStoryFormatter";
 import { renderMarkdown } from "@/utils/markdownRenderer";
 import { motion } from "framer-motion";
@@ -23,7 +22,7 @@ export function UserStoryPreview({
   const formattedStory = formatUserStory(data);
   const [copied, setCopied] = useState(false);
   const [titleCopied, setTitleCopied] = useState(false);
-  const titleInputRef = useRef<HTMLInputElement>(null);
+  const [titleClicked, setTitleClicked] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -42,14 +41,14 @@ export function UserStoryPreview({
     try {
       await navigator.clipboard.writeText(data.title.trim());
       setTitleCopied(true);
-      setTimeout(() => setTitleCopied(false), 2000);
+      setTitleClicked(true);
+      setTimeout(() => {
+        setTitleCopied(false);
+        setTitleClicked(false);
+      }, 2000);
       onSaveToHistory();
     } catch (error) {
       console.error("Failed to copy title:", error);
-      if (titleInputRef.current) {
-        titleInputRef.current.select();
-        titleInputRef.current.setSelectionRange(0, 99999);
-      }
     }
   };
 
@@ -83,29 +82,49 @@ export function UserStoryPreview({
 
       {data.title && data.title.trim() && (
         <div className="mb-4">
-          <label
-            htmlFor="preview-title"
-            className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-          >
+          <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
             Title
           </label>
-          <div className="flex gap-2">
-            <input
-              ref={titleInputRef}
-              id="preview-title"
-              type="text"
-              value={data.title}
-              readOnly
-              className="flex-1 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 cursor-text"
-            />
-            <button
-              type="button"
-              onClick={handleCopyTitle}
-              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 whitespace-nowrap"
-              aria-label="Copy title"
-            >
-              {titleCopied ? "Copied!" : "Copy"}
-            </button>
+          <div
+            onClick={handleCopyTitle}
+            className={`relative w-full px-4 py-2 pr-10 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer transition-all select-none ${
+              titleClicked
+                ? "bg-blue-100 dark:bg-blue-900/30 border-blue-400 dark:border-blue-600"
+                : "hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            }`}
+          >
+            <div className="pr-8 truncate">{data.title}</div>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+              {titleCopied ? (
+                <svg
+                  className="w-5 h-5 text-green-600 dark:text-green-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-zinc-600 dark:text-zinc-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              )}
+            </div>
           </div>
         </div>
       )}

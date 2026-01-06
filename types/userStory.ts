@@ -8,4 +8,5 @@ export interface UserStoryData {
   additionalInfo?: string;
   acceptanceCriteria: string[];
   technicalInfo: string[];
+  isAiGenerated?: boolean;
 }

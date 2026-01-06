@@ -77,7 +77,6 @@ export async function initializeDatabase(): Promise<void> {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  // Add is_draft column if it doesn't exist (for existing databases)
   try {
     const [columns] = await db.execute<RowDataPacket[]>(
       `SHOW COLUMNS FROM user_stories LIKE 'is_draft'`
@@ -107,7 +106,6 @@ export async function initializeDatabase(): Promise<void> {
     // Column might already exist, ignore error
   }
 
-  // Add additional_info column if it doesn't exist (for existing databases)
   try {
     const [columns] = await db.execute<RowDataPacket[]>(
       `SHOW COLUMNS FROM user_stories LIKE 'additional_info'`
@@ -118,9 +116,31 @@ export async function initializeDatabase(): Promise<void> {
         ADD COLUMN additional_info TEXT
       `);
     }
-  } catch {
-    // Column might already exist, ignore error
-  }
+  } catch {}
+
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'title'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN title VARCHAR(500)
+      `);
+    }
+  } catch {}
+
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'is_ai_generated'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN is_ai_generated BOOLEAN DEFAULT FALSE
+      `);
+    }
+  } catch {}
 
   // Create sessions table for storing session metadata
   await db.execute(`

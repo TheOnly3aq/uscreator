@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { UserStoryPreviewProps } from "@/types/userStoryComponents";
 import { UserStoryData } from "@/types/userStory";
 import { formatUserStory } from "@/utils/userStoryFormatter";
@@ -22,6 +22,8 @@ export function UserStoryPreview({
 }: UserStoryPreviewProps) {
   const formattedStory = formatUserStory(data);
   const [copied, setCopied] = useState(false);
+  const [titleCopied, setTitleCopied] = useState(false);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   const handleCopy = async () => {
     try {
@@ -31,6 +33,23 @@ export function UserStoryPreview({
       onSaveToHistory();
     } catch (error) {
       console.error("Failed to copy:", error);
+    }
+  };
+
+  const handleCopyTitle = async () => {
+    if (!data.title?.trim()) return;
+
+    try {
+      await navigator.clipboard.writeText(data.title.trim());
+      setTitleCopied(true);
+      setTimeout(() => setTitleCopied(false), 2000);
+      onSaveToHistory();
+    } catch (error) {
+      console.error("Failed to copy title:", error);
+      if (titleInputRef.current) {
+        titleInputRef.current.select();
+        titleInputRef.current.setSelectionRange(0, 99999);
+      }
     }
   };
 
@@ -61,6 +80,36 @@ export function UserStoryPreview({
           </button>
         </div>
       </div>
+
+      {data.title && data.title.trim() && (
+        <div className="mb-4">
+          <label
+            htmlFor="preview-title"
+            className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+          >
+            Title
+          </label>
+          <div className="flex gap-2">
+            <input
+              ref={titleInputRef}
+              id="preview-title"
+              type="text"
+              value={data.title}
+              readOnly
+              className="flex-1 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 cursor-text"
+            />
+            <button
+              type="button"
+              onClick={handleCopyTitle}
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 whitespace-nowrap"
+              aria-label="Copy title"
+            >
+              {titleCopied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="p-6 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 min-h-[200px]">
         <div className="text-sm leading-relaxed">
           {renderMarkdown(formattedStory)}

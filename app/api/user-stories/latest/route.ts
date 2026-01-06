@@ -5,6 +5,7 @@ import { RowDataPacket } from "mysql2";
 
 interface UserStoryRecord extends RowDataPacket {
   type: string;
+  title: string | null;
   role: string;
   action: string;
   benefit: string;
@@ -12,6 +13,7 @@ interface UserStoryRecord extends RowDataPacket {
   additional_info: string | null;
   acceptance_criteria: string;
   technical_info: string;
+  is_ai_generated: boolean;
 }
 
 /**
@@ -35,14 +37,14 @@ export async function GET(request: NextRequest) {
     let params: (string | undefined)[];
 
     if (type) {
-      query = `SELECT type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info
+      query = `SELECT type, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_ai_generated
                FROM user_stories
                WHERE session_id = ? AND is_draft = TRUE AND type = ?
                ORDER BY updated_at DESC
                LIMIT 1`;
       params = [sessionId, type];
     } else {
-      query = `SELECT type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info
+      query = `SELECT type, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_ai_generated
                FROM user_stories
                WHERE session_id = ? AND is_draft = TRUE
                ORDER BY updated_at DESC
@@ -59,6 +61,7 @@ export async function GET(request: NextRequest) {
     const row = rows[0];
     const data: UserStoryData = {
       type: (row.type === "bug" ? "bug" : "story") as "story" | "bug",
+      title: row.title || undefined,
       role: row.role || "",
       action: row.action || "",
       benefit: row.benefit || "",
@@ -72,6 +75,7 @@ export async function GET(request: NextRequest) {
         typeof row.technical_info === "string"
           ? JSON.parse(row.technical_info)
           : row.technical_info || [""],
+      isAiGenerated: row.is_ai_generated || false,
     };
 
     return NextResponse.json({ data });

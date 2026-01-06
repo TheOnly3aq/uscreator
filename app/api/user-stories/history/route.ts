@@ -6,6 +6,7 @@ import { RowDataPacket } from "mysql2";
 interface UserStoryRecord extends RowDataPacket {
   id: number;
   type: string;
+  title: string | null;
   role: string;
   action: string;
   benefit: string;
@@ -13,6 +14,7 @@ interface UserStoryRecord extends RowDataPacket {
   additional_info: string | null;
   acceptance_criteria: string;
   technical_info: string;
+  is_ai_generated: boolean;
   created_at: Date;
   updated_at: Date;
 }
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     const db = getPool();
     const [rows] = await db.execute<UserStoryRecord[]>(
-      `SELECT id, type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, created_at, updated_at
+      `SELECT id, type, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_ai_generated, created_at, updated_at
        FROM user_stories
        WHERE session_id = ? AND is_draft = FALSE
        ORDER BY created_at DESC
@@ -43,6 +45,7 @@ export async function GET(request: NextRequest) {
       id: row.id,
       data: {
         type: (row.type === "bug" ? "bug" : "story") as "story" | "bug",
+        title: row.title || undefined,
         role: row.role || "",
         action: row.action || "",
         benefit: row.benefit || "",
@@ -56,6 +59,7 @@ export async function GET(request: NextRequest) {
           typeof row.technical_info === "string"
             ? JSON.parse(row.technical_info)
             : row.technical_info || [""],
+        isAiGenerated: row.is_ai_generated || false,
       } as UserStoryData,
       createdAt: row.created_at,
       updatedAt: row.updated_at,

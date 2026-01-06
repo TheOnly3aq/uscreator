@@ -17,13 +17,6 @@ interface HistoryProps {
   onLoadStory: (data: UserStoryData) => void;
 }
 
-/**
- * History component that displays saved user stories
- * @param {HistoryProps} props - Component props
- * @param {(data: UserStoryData) => void} props.onLoadStory - Callback function to load a story
- * 
- * @returns {JSX.Element} The history component
- */
 export function History({ onLoadStory }: HistoryProps) {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -148,7 +141,12 @@ export function History({ onLoadStory }: HistoryProps) {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  {item.data.title && (
+                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+                      {item.data.title}
+                    </h3>
+                  )}
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium ${
                         item.data.type === "bug"
@@ -158,6 +156,11 @@ export function History({ onLoadStory }: HistoryProps) {
                     >
                       {item.data.type === "bug" ? "Bug" : "Story"}
                     </span>
+                    {item.data.isAiGenerated && (
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
+                        AI Generated
+                      </span>
+                    )}
                     <div className="text-sm text-zinc-500 dark:text-zinc-400">
                       Updated: {formatDate(item.updatedAt)}
                     </div>

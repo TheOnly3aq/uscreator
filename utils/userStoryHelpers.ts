@@ -7,6 +7,7 @@ import { UserStoryData } from "@/types/userStory";
  */
 export const hasUserStoryContent = (data: UserStoryData): boolean => {
   return (
+    !!data.title?.trim() ||
     !!data.role.trim() ||
     !!data.action.trim() ||
     !!data.benefit.trim() ||

@@ -21,8 +21,12 @@ export function AICreation({ onGenerate }: AICreationProps) {
   const [error, setError] = useState<string | null>(null);
   const [showThinPromptModal, setShowThinPromptModal] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [generatedTitle, setGeneratedTitle] = useState<string | null>(null);
+  const [isTitleCopied, setIsTitleCopied] = useState(false);
+  const [generatedData, setGeneratedData] = useState<UserStoryData | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   /**
    * Checks if the prompt is too thin (not enough information)
@@ -55,6 +59,7 @@ export function AICreation({ onGenerate }: AICreationProps) {
 
     setIsGenerating(true);
     setError(null);
+    setGeneratedTitle(null);
 
     try {
       const response = await fetch("/api/user-stories/ai-generate/", {
@@ -72,7 +77,9 @@ export function AICreation({ onGenerate }: AICreationProps) {
       }
 
       if (result.data) {
-        onGenerate(result.data);
+        const title = result.data.title?.trim() || null;
+        setGeneratedTitle(title);
+        setGeneratedData(result.data);
       } else {
         throw new Error("No data received from AI");
       }
@@ -147,6 +154,8 @@ export function AICreation({ onGenerate }: AICreationProps) {
 
       if (response.ok) {
         setPrompt("");
+        setGeneratedTitle(null);
+        setGeneratedData(null);
       } else {
         throw new Error("Failed to clear prompt");
       }
@@ -155,6 +164,24 @@ export function AICreation({ onGenerate }: AICreationProps) {
       setError("Failed to clear prompt");
     } finally {
       setIsClearing(false);
+    }
+  };
+
+  const handleCopyTitle = async () => {
+    if (!generatedTitle) return;
+
+    try {
+      await navigator.clipboard.writeText(generatedTitle);
+      setIsTitleCopied(true);
+      setTimeout(() => {
+        setIsTitleCopied(false);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to copy title:", err);
+      if (titleInputRef.current) {
+        titleInputRef.current.select();
+        titleInputRef.current.setSelectionRange(0, 99999);
+      }
     }
   };
 
@@ -199,7 +226,11 @@ export function AICreation({ onGenerate }: AICreationProps) {
         <select
           id="ai-type"
           value={type}
-          onChange={(e) => setType(e.target.value as "story" | "bug")}
+          onChange={(e) => {
+            setType(e.target.value as "story" | "bug");
+            setGeneratedTitle(null);
+            setGeneratedData(null);
+          }}
           disabled={isGenerating}
           className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -253,17 +284,71 @@ export function AICreation({ onGenerate }: AICreationProps) {
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => handleGenerate()}
-        disabled={isGenerating || !prompt.trim()}
-        className="w-full px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-400 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white font-medium transition-colors"
-        aria-label="Generate user story with AI"
-      >
-        {isGenerating
-          ? "Generating..."
-          : `Generate ${type === "story" ? "User Story" : "Bug Report"}`}
-      </button>
+      {generatedData && (
+        <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+          <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-4">
+            ✓ Successfully generated {type === "story" ? "user story" : "bug report"}!
+          </p>
+          
+          {generatedTitle && (
+            <div className="mb-4">
+              <label
+                htmlFor="generated-title"
+                className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+              >
+                Generated Title
+              </label>
+              <div className="flex gap-2">
+                <input
+                  ref={titleInputRef}
+                  id="generated-title"
+                  type="text"
+                  value={generatedTitle}
+                  readOnly
+                  className="flex-1 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 cursor-text"
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyTitle}
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 whitespace-nowrap"
+                  aria-label="Copy title"
+                >
+                  {isTitleCopied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+            </div>
+          )}
+          
+          <button
+            type="button"
+            onClick={() => {
+              if (generatedData) {
+                onGenerate(generatedData);
+                setGeneratedData(null);
+                setGeneratedTitle(null);
+              }
+            }}
+            className="w-full px-4 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400"
+            aria-label="Continue to form"
+          >
+            Continue to Form
+          </button>
+        </div>
+      )}
+
+      {!generatedData && (
+        <button
+          type="button"
+          onClick={() => handleGenerate()}
+          disabled={isGenerating || !prompt.trim()}
+          className="w-full px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-400 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white font-medium transition-colors"
+          aria-label="Generate user story with AI"
+        >
+          {isGenerating
+            ? "Generating..."
+            : `Generate ${type === "story" ? "User Story" : "Bug Report"}`}
+        </button>
+      )}
 
       <AnimatePresence>
         {showThinPromptModal && (

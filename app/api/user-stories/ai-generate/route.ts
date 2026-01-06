@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
     const systemPrompt = type === "story" 
       ? `You are an expert at creating user stories. Generate a user story based STRICTLY on the user's prompt. Return ONLY a valid JSON object with the following structure:
 {
+  "title": "string - a concise, descriptive title for the user story (e.g., 'User Preference Saving Feature')",
   "role": "string - the user role (e.g., 'user', 'admin', 'developer')",
   "action": "string - what the user wants to do (e.g., 'to save my preferences')",
   "benefit": "string - why the user wants this (e.g., 'I can have a personalized experience')",
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
 }
 
 CRITICAL RULES - YOU MUST FOLLOW THESE STRICTLY:
+- Generate a concise, descriptive title (3-8 words) that summarizes the user story
 - ONLY use information that is explicitly stated or clearly implied in the user's prompt
 - DO NOT add details, features, or information that are not mentioned in the user's prompt
 - DO NOT make assumptions or invent details that aren't in the prompt
@@ -52,6 +54,7 @@ CRITICAL RULES - YOU MUST FOLLOW THESE STRICTLY:
 - Return ONLY the JSON object, no additional text or markdown formatting`
       : `You are an expert at creating bug reports. Generate a bug report based STRICTLY on the user's prompt. Return ONLY a valid JSON object with the following structure:
 {
+  "title": "string - a concise, descriptive title for the bug (e.g., 'Disabled Filter Redirects to Undefined Page')",
   "role": "string - the bug title/description (e.g., 'Users should be able to select the disabled filter without being redirected')",
   "action": "string - the scenario/steps to reproduce (can be markdown formatted with bullet points)",
   "benefit": "string - the expected result",
@@ -62,6 +65,7 @@ CRITICAL RULES - YOU MUST FOLLOW THESE STRICTLY:
 }
 
 CRITICAL RULES - YOU MUST FOLLOW THESE STRICTLY:
+- Generate a concise, descriptive title (3-8 words) that summarizes the bug
 - ONLY use information that is explicitly stated or clearly implied in the user's prompt
 - DO NOT add details, features, or information that are not mentioned in the user's prompt
 - DO NOT make assumptions or invent details that aren't in the prompt
@@ -138,6 +142,7 @@ Remember: Only extract and use information that is actually provided above. Leav
 
     const userStoryData: UserStoryData = {
       type,
+      title: parsedData.title || "",
       role: parsedData.role || "",
       action: parsedData.action || "",
       benefit: parsedData.benefit || "",

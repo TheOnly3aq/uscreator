@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserStoryData } from "@/types/userStory";
+import { generateStoryId } from "@/utils/userStoryHelpers";
 
 interface AICreationProps {
   onGenerate: (data: UserStoryData) => void;
@@ -69,7 +70,11 @@ export function AICreation({ onGenerate }: AICreationProps) {
       }
 
       if (result.data) {
-        onGenerate({ ...result.data, isAiGenerated: true });
+        onGenerate({
+          ...result.data,
+          isAiGenerated: true,
+          storyId: result.data.storyId || generateStoryId(),
+        });
       } else {
         throw new Error("No data received from AI");
       }

@@ -27,11 +27,12 @@ export async function POST(request: NextRequest) {
 
     await db.execute(
       `INSERT INTO user_stories 
-       (session_id, type, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft, is_ai_generated)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE, ?)`,
+       (session_id, type, story_id, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft, is_ai_generated)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE, ?)`,
       [
         sessionId,
         data.type || "story",
+        data.storyId || null,
         data.title || null,
         data.role || null,
         data.action || null,

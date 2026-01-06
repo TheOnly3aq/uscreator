@@ -1,5 +1,6 @@
 export interface UserStoryData {
   type: "story" | "bug";
+  storyId?: string;
   title?: string;
   role: string;
   action: string;

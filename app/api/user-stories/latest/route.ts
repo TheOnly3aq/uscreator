@@ -5,6 +5,7 @@ import { RowDataPacket } from "mysql2";
 
 interface UserStoryRecord extends RowDataPacket {
   type: string;
+  story_id: string | null;
   title: string | null;
   role: string;
   action: string;
@@ -37,14 +38,14 @@ export async function GET(request: NextRequest) {
     let params: (string | undefined)[];
 
     if (type) {
-      query = `SELECT type, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_ai_generated
+      query = `SELECT type, story_id, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_ai_generated
                FROM user_stories
                WHERE session_id = ? AND is_draft = TRUE AND type = ?
                ORDER BY updated_at DESC
                LIMIT 1`;
       params = [sessionId, type];
     } else {
-      query = `SELECT type, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_ai_generated
+      query = `SELECT type, story_id, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_ai_generated
                FROM user_stories
                WHERE session_id = ? AND is_draft = TRUE
                ORDER BY updated_at DESC
@@ -61,6 +62,7 @@ export async function GET(request: NextRequest) {
     const row = rows[0];
     const data: UserStoryData = {
       type: (row.type === "bug" ? "bug" : "story") as "story" | "bug",
+      storyId: row.story_id || undefined,
       title: row.title || undefined,
       role: row.role || "",
       action: row.action || "",

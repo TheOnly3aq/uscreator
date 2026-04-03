@@ -18,7 +18,7 @@ export const Footer = () => {
             <span className="hidden text-[#424245] sm:inline" aria-hidden>
               •
             </span>
-            <span className="text-[12px] text-[#6e6e73]">v1.3.0</span>
+            <span className="text-[12px] text-[#6e6e73]">v1.3.1</span>
           </div>
         </div>
       </div>

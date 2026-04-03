@@ -6,9 +6,9 @@ interface StoryCardProps {
   onDeleteStory: (storyId: number) => Promise<void>;
 }
 
-function formatDate(dateString: string) {
+const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleString();
-}
+};
 
 /**
  * Story card component displaying individual user story details
@@ -16,7 +16,7 @@ function formatDate(dateString: string) {
  * @param {AdminUserStory} props.story - User story data to display
  * @param {(storyId: number) => Promise<void>} props.onDeleteStory - Callback function to delete a story
  */
-export function StoryCard({ story, onDeleteStory }: StoryCardProps) {
+export const StoryCard = ({ story, onDeleteStory }: StoryCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -35,110 +35,101 @@ export function StoryCard({ story, onDeleteStory }: StoryCardProps) {
     }
   };
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 border border-zinc-200 dark:border-zinc-800">
-      <div className="flex items-start justify-between mb-4">
+    <div className="apple-panel p-6 sm:p-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[11px] text-[#6e6e73]">
               ID: {story.id}
             </span>
             <span
-              className={`px-2 py-1 rounded text-xs font-medium ${
+              className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
                 story.type === "bug"
-                  ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                  : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                  ? "bg-[#ff453a]/20 text-[#ff9a93]"
+                  : "bg-[#2997ff]/20 text-[#6eb9ff]"
               }`}
             >
               {story.type === "bug" ? "Bug" : "Story"}
             </span>
             {story.isDraft && (
-              <span className="px-2 py-1 text-xs rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200">
+              <span className="rounded-full bg-[#ffd60a]/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#ffe98a]">
                 Draft
               </span>
             )}
           </div>
-          <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
-            Session: {story.sessionId.substring(0, 16)}...
+          <p className="font-mono text-[11px] text-[#6e6e73]">
+            Session: {story.sessionId.substring(0, 16)}…
           </p>
         </div>
-        <div className="flex items-start gap-4">
-          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="flex flex-col items-start gap-3 sm:items-end">
+          <div className="text-[11px] text-[#6e6e73]">
             <div>Created: {formatDate(story.createdAt)}</div>
             <div>Updated: {formatDate(story.updatedAt)}</div>
           </div>
           <button
+            type="button"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+            className="text-[12px] font-semibold text-[#ff6961] transition-colors hover:text-[#ff9a93] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting ? "Deleting…" : "Delete"}
           </button>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4 text-[15px]">
         {story.role && (
           <div>
-            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <span className="text-[13px] font-semibold text-[#a1a1a6]">
               Role:
             </span>{" "}
-            <span className="text-zinc-900 dark:text-zinc-100">{story.role}</span>
+            <span className="text-[#f5f5f7]">{story.role}</span>
           </div>
         )}
         {story.action && (
           <div>
-            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <span className="text-[13px] font-semibold text-[#a1a1a6]">
               Action:
             </span>{" "}
-            <span className="text-zinc-900 dark:text-zinc-100">
-              {story.action}
-            </span>
+            <span className="text-[#f5f5f7]">{story.action}</span>
           </div>
         )}
         {story.benefit && (
           <div>
-            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <span className="text-[13px] font-semibold text-[#a1a1a6]">
               Benefit:
             </span>{" "}
-            <span className="text-zinc-900 dark:text-zinc-100">
-              {story.benefit}
-            </span>
+            <span className="text-[#f5f5f7]">{story.benefit}</span>
           </div>
         )}
         {story.background && (
           <div>
-            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <span className="text-[13px] font-semibold text-[#a1a1a6]">
               Background:
             </span>
-            <p className="text-zinc-900 dark:text-zinc-100 mt-1">
-              {story.background}
-            </p>
+            <p className="mt-1 text-[#d1d1d6]">{story.background}</p>
           </div>
         )}
         {story.acceptanceCriteria.length > 0 && (
           <div>
-            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-              Acceptance Criteria:
+            <span className="text-[13px] font-semibold text-[#a1a1a6]">
+              Acceptance criteria:
             </span>
-            <ul className="list-disc list-inside mt-1 space-y-1">
+            <ul className="mt-2 list-inside list-disc space-y-1 text-[#d1d1d6]">
               {story.acceptanceCriteria.map((criteria, idx) => (
-                <li key={idx} className="text-zinc-900 dark:text-zinc-100">
-                  {criteria}
-                </li>
+                <li key={idx}>{criteria}</li>
               ))}
             </ul>
           </div>
         )}
         {story.technicalInfo.length > 0 && (
           <div>
-            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-              Technical Info:
+            <span className="text-[13px] font-semibold text-[#a1a1a6]">
+              Technical info:
             </span>
-            <ul className="list-disc list-inside mt-1 space-y-1">
+            <ul className="mt-2 list-inside list-disc space-y-1 text-[#d1d1d6]">
               {story.technicalInfo.map((info, idx) => (
-                <li key={idx} className="text-zinc-900 dark:text-zinc-100">
-                  {info}
-                </li>
+                <li key={idx}>{info}</li>
               ))}
             </ul>
           </div>
@@ -146,5 +137,4 @@ export function StoryCard({ story, onDeleteStory }: StoryCardProps) {
       </div>
     </div>
   );
-}
-
+};

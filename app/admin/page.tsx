@@ -137,7 +137,7 @@ export default function AdminDashboard() {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <div className="text-zinc-600 dark:text-zinc-400">Loading...</div>
+        <div className="text-[15px] text-[#a1a1a6]">Loading…</div>
       </div>
     );
   }
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-zinc-950 min-h-screen">
+    <div className="flex min-h-screen flex-1 flex-col bg-black">
       <AdminHeader
         isRefreshing={isRefreshing}
         onRefresh={fetchData}

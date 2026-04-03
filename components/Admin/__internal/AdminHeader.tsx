@@ -11,34 +11,35 @@ interface AdminHeaderProps {
  * @param {() => void} props.onRefresh - Callback function to refresh data
  * @param {() => void} props.onLogout - Callback function to logout
  */
-export function AdminHeader({
+export const AdminHeader = ({
   isRefreshing,
   onRefresh,
   onLogout,
-}: AdminHeaderProps) {
+}: AdminHeaderProps) => {
   return (
-    <div className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-          Admin Dashboard
+    <div className="border-b border-white/[0.08] bg-black/50 px-6 py-5 backdrop-blur-2xl">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-[28px] font-semibold tracking-tight text-[#f5f5f7]">
+          Dashboard
         </h1>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap gap-2">
           <button
+            type="button"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white transition-colors text-sm font-medium"
+            className="apple-btn-primary apple-btn-compact disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isRefreshing ? "Refreshing..." : "Refresh"}
+            {isRefreshing ? "Refreshing…" : "Refresh"}
           </button>
           <button
+            type="button"
             onClick={onLogout}
-            className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 transition-colors text-sm font-medium"
+            className="apple-btn-secondary apple-btn-compact"
           >
-            Logout
+            Log out
           </button>
         </div>
       </div>
     </div>
   );
-}
-
+};

@@ -9,16 +9,15 @@ interface StatCardProps {
  * @param {string} props.title - Title of the stat card
  * @param {number} props.value - Numeric value to display
  */
-export function StatCard({ title, value }: StatCardProps) {
+export const StatCard = ({ title, value }: StatCardProps) => {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 border border-zinc-200 dark:border-zinc-800">
-      <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+    <div className="apple-panel p-6">
+      <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6e6e73]">
         {title}
       </div>
-      <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+      <div className="text-[32px] font-semibold tabular-nums tracking-tight text-[#f5f5f7]">
         {value.toLocaleString()}
       </div>
     </div>
   );
-}
-
+};

@@ -6,14 +6,7 @@ import { formatUserStory } from "@/utils/userStoryFormatter";
 import { renderMarkdown } from "@/utils/markdownRenderer";
 import { motion } from "framer-motion";
 
-/**
- * Preview component that displays the formatted user story
- * @param {UserStoryPreviewProps} props - Component props
- * @param {UserStoryData} props.data - User story data to preview
- * @param {() => void} props.onClear - Callback function to clear the form
- * @param {() => void} props.onSaveToHistory - Callback function called when story is copied to save to history
- * @returns {JSX.Element} The user story preview component
- */
+/** Renders formatted output, copy actions, and clear. */
 export function UserStoryPreview({
   data,
   onClear,
@@ -58,46 +51,55 @@ export function UserStoryPreview({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-[21px] font-semibold tracking-tight text-[#f5f5f7]">
           Preview
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={onClear}
-            className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors text-sm font-medium"
+            className="apple-btn-danger apple-btn-compact"
           >
             Clear
           </button>
           <button
             type="button"
             onClick={handleCopy}
-            className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors text-sm font-medium"
+            className="apple-btn-primary apple-btn-compact"
           >
-            {copied ? "Copied!" : "Copy"}
+            {copied ? "Copied" : "Copy"}
           </button>
         </div>
       </div>
 
       {data.title && data.title.trim() && (
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
+          <label className="mb-2 block text-[13px] font-semibold text-[#a1a1a6]">
             Title
           </label>
           <div
             onClick={handleCopyTitle}
-            className={`relative w-full px-4 py-2 pr-10 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer transition-all select-none ${
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                void handleCopyTitle();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Copy title to clipboard"
+            className={`relative w-full cursor-pointer select-none rounded-2xl border px-4 py-3 pr-10 text-[15px] text-[#f5f5f7] transition-all ${
               titleClicked
-                ? "bg-blue-100 dark:bg-blue-900/30 border-blue-400 dark:border-blue-600"
-                : "hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                ? "border-[#2997ff]/45 bg-[#2997ff]/10"
+                : "border-white/[0.12] bg-white/[0.05] hover:bg-white/[0.08]"
             }`}
           >
             <div className="pr-8 truncate">{data.title}</div>
             <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
               {titleCopied ? (
                 <svg
-                  className="w-5 h-5 text-green-600 dark:text-green-400"
+                  className="h-5 w-5 text-[#30d158]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -111,7 +113,7 @@ export function UserStoryPreview({
                 </svg>
               ) : (
                 <svg
-                  className="w-5 h-5 text-zinc-600 dark:text-zinc-400"
+                  className="h-5 w-5 text-[#a1a1a6]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -129,8 +131,8 @@ export function UserStoryPreview({
         </div>
       )}
 
-      <div className="p-6 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 min-h-[200px]">
-        <div className="text-sm leading-relaxed">
+      <div className="min-h-[200px] rounded-2xl border border-white/[0.1] bg-black/30 p-6 shadow-inner shadow-black/40">
+        <div className="text-[15px] leading-relaxed text-[#d1d1d6]">
           {renderMarkdown(formattedStory)}
         </div>
       </div>

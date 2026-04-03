@@ -2,24 +2,26 @@
  * Footer component displaying creator information and links
  * @returns {JSX.Element} The footer component
  */
-export function Footer() {
+export const Footer = () => {
   return (
-    <footer>
-      <div className="max-w-6xl mx-auto px-4 py-3">
-        <div className="flex flex-col items-center justify-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 text-center">
-          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
-            <span className="text-zinc-900 dark:text-zinc-100 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors font-medium">
+    <footer className="border-t border-white/[0.08] bg-black/40 backdrop-blur-xl">
+      <div className="mx-auto max-w-6xl px-5 py-6">
+        <div className="flex flex-col items-center justify-center gap-2 text-center text-[13px] text-[#a1a1a6]">
+          <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-3">
+            <span className="font-medium text-[#f5f5f7] transition-colors hover:text-white">
               My by KT
             </span>
-            <span className="hidden sm:inline">•</span>
-            <span>© Copyright 2026</span>
-            <span className="hidden sm:inline">•</span>
-            <span className="text-xs text-zinc-500 dark:text-zinc-300">
-              v1.2.6
+            <span className="hidden text-[#424245] sm:inline" aria-hidden>
+              •
             </span>
+            <span>© Copyright 2026</span>
+            <span className="hidden text-[#424245] sm:inline" aria-hidden>
+              •
+            </span>
+            <span className="text-[12px] text-[#6e6e73]">v1.2.6</span>
           </div>
         </div>
       </div>
     </footer>
   );
-}
+};

@@ -1,373 +1,47 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  startTransition,
-} from "react";
 import { motion } from "framer-motion";
-import { UserStoryData } from "@/types/userStory";
-import { getCookie, setSessionId, getSessionId } from "@/utils/cookies";
-import {
-  hasUserStoryContent,
-  createEmptyUserStoryData,
-  generateStoryId,
-} from "@/utils/userStoryHelpers";
 import { PasswordGate } from "./UserStoryCreator/__internal/PasswordGate";
 import { UserStoryForm } from "./UserStoryCreator/__internal/UserStoryForm";
 import { UserStoryPreview } from "./UserStoryCreator/__internal/UserStoryPreview";
-import {
-  History,
-  type HistoryItem,
-} from "./UserStoryCreator/__internal/History";
+import { History } from "./UserStoryCreator/__internal/History";
 import { AICreation } from "./UserStoryCreator/__internal/AICreation";
+import { useUserStoryCreator } from "./UserStoryCreator/useUserStoryCreator";
 
 /**
- * Main user story creator component that manages authentication, form state, and user story creation
- * @returns {JSX.Element} The user story creator component or password gate if not authenticated
+ * Main user story creator: authentication, tabs, form, AI flow, and history.
  */
 export function UserStoryCreator() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<"form" | "history" | "ai">("form");
-  const [currentType, setCurrentType] = useState<"story" | "bug">("story");
-  const [storyData, setStoryData] = useState<UserStoryData>({
-    type: "story",
-    role: "",
-    action: "",
-    benefit: "",
-    background: "",
-    additionalInfo: "",
-    acceptanceCriteria: [""],
-    technicalInfo: [""],
-  });
-  const [bugData, setBugData] = useState<UserStoryData>({
-    type: "bug",
-    role: "",
-    action: "",
-    benefit: "",
-    background: "",
-    additionalInfo: "",
-    acceptanceCriteria: [""],
-    technicalInfo: [""],
-  });
-  const [isSaving, setIsSaving] = useState(false);
-  const [isBootstrapping, setIsBootstrapping] = useState(false);
-  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
-  const [aiPrompt, setAiPrompt] = useState("");
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hasInitializedRef = useRef(false);
-  const isTypeChangingRef = useRef(false);
-
-  const userStoryData = currentType === "story" ? storyData : bugData;
-
-  useEffect(() => {
-    if (getCookie() !== "authenticated") {
-      return;
-    }
-    startTransition(() => {
-      setIsAuthenticated(true);
-      setIsBootstrapping(true);
-      const savedTab = localStorage.getItem("userstory_active_tab");
-      if (
-        savedTab &&
-        (savedTab === "form" || savedTab === "history" || savedTab === "ai")
-      ) {
-        setActiveTab(savedTab as "form" | "history" | "ai");
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-    if (hasInitializedRef.current) {
-      return;
-    }
-
-    const initializeSession = async () => {
-      setIsBootstrapping(true);
-      try {
-        const existingSessionId = getSessionId();
-        if (!existingSessionId) {
-          const response = await fetch("/api/session/");
-          const { sessionId } = await response.json();
-          if (sessionId) {
-            setSessionId(sessionId);
-          }
-        }
-
-        const savedType = localStorage.getItem("userstory_selected_type");
-        const initialType =
-          savedType === "bug" || savedType === "story" ? savedType : "story";
-        setCurrentType(initialType);
-
-        const [
-          storyResponse,
-          bugResponse,
-          promptResponse,
-          historyResponse,
-        ] = await Promise.all([
-          fetch("/api/user-stories/latest/?type=story"),
-          fetch("/api/user-stories/latest/?type=bug"),
-          fetch("/api/user-stories/ai-prompt"),
-          fetch("/api/user-stories/history/"),
-        ]);
-
-        const [storyResult, bugResult, promptResult, historyResult] =
-          await Promise.all([
-            storyResponse.json(),
-            bugResponse.json(),
-            promptResponse.json(),
-            historyResponse.json(),
-          ]);
-
-        if (storyResult.data) {
-          setStoryData({ ...storyResult.data, storyId: storyResult.data.storyId || generateStoryId() });
-        } else {
-          setStoryData(createEmptyUserStoryData("story"));
-        }
-
-        if (bugResult.data) {
-          setBugData({ ...bugResult.data, storyId: bugResult.data.storyId || generateStoryId() });
-        } else {
-          setBugData(createEmptyUserStoryData("bug"));
-        }
-
-        if (typeof promptResult?.prompt === "string") {
-          setAiPrompt(promptResult.prompt);
-        }
-
-        if (historyResult.error) {
-          console.error("History bootstrap:", historyResult.error);
-          setHistoryItems([]);
-        } else {
-          setHistoryItems(historyResult.history ?? []);
-        }
-
-        hasInitializedRef.current = true;
-      } catch (error) {
-        console.error("Error initializing session:", error);
-        hasInitializedRef.current = true;
-      } finally {
-        setIsBootstrapping(false);
-      }
-    };
-
-    void initializeSession();
-  }, [isAuthenticated]);
-
-  const saveUserStory = useCallback(async (data: UserStoryData) => {
-    if (!hasUserStoryContent(data)) {
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      await fetch("/api/user-stories/save/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-    } catch (error) {
-      console.error("Error saving user story:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (
-      !isAuthenticated ||
-      !hasInitializedRef.current ||
-      isTypeChangingRef.current
-    ) {
-      return;
-    }
-
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
-    saveTimeoutRef.current = setTimeout(() => {
-      saveUserStory(userStoryData);
-    }, 2000);
-
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-    };
-  }, [userStoryData, isAuthenticated, saveUserStory]);
-
-  const handleDataChange = useCallback((data: UserStoryData) => {
-    const currentData = data.type === "story" ? storyData : bugData;
-    const dataWithId = {
-      ...data,
-      storyId: data.storyId || currentData.storyId || generateStoryId(),
-    };
-    if (data.type === "story") {
-      setStoryData(dataWithId);
-    } else {
-      setBugData(dataWithId);
-    }
-  }, [storyData, bugData]);
-
-  const handleTypeChange = useCallback(
-    async (newType: "story" | "bug") => {
-      if (newType === currentType) {
-        return;
-      }
-
-      isTypeChangingRef.current = true;
-
-      const currentData = currentType === "story" ? storyData : bugData;
-
-      if (hasUserStoryContent(currentData)) {
-        try {
-          await fetch("/api/user-stories/save/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(currentData),
-          });
-        } catch (error) {
-          console.error("Error saving draft before type change:", error);
-        }
-      }
-
-      setCurrentType(newType);
-      localStorage.setItem("userstory_selected_type", newType);
-
-      try {
-        const response = await fetch(
-          `/api/user-stories/latest/?type=${newType}`
-        );
-        const { data } = await response.json();
-        if (data) {
-          if (newType === "story") {
-            setStoryData({ ...data, storyId: data.storyId || generateStoryId() });
-          } else {
-            setBugData({ ...data, storyId: data.storyId || generateStoryId() });
-          }
-        } else {
-          const emptyData = createEmptyUserStoryData(newType);
-          if (newType === "story") {
-            setStoryData(emptyData);
-          } else {
-            setBugData(emptyData);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading draft for new type:", error);
-      }
-
-      isTypeChangingRef.current = false;
-    },
-    [currentType, storyData, bugData]
-  );
-
-  const handleClear = useCallback(async () => {
-    try {
-      await fetch("/api/user-stories/delete-all/", {
-        method: "DELETE",
-      });
-    } catch (error) {
-      console.error("Error clearing user stories:", error);
-    }
-
-    const emptyData = createEmptyUserStoryData(currentType);
-
-    if (currentType === "story") {
-      setStoryData(emptyData);
-    } else {
-      setBugData(emptyData);
-    }
-
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-  }, [currentType]);
-
-  const handleSaveToHistory = useCallback(async () => {
-    if (!hasUserStoryContent(userStoryData)) {
-      return;
-    }
-
-    const dataToSave = {
-      ...userStoryData,
-      storyId: userStoryData.storyId || generateStoryId(),
-    };
-
-    try {
-      const saveResponse = await fetch("/api/user-stories/save-history/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSave),
-      });
-      if (!saveResponse.ok) {
-        return;
-      }
-      const historyResponse = await fetch("/api/user-stories/history/");
-      const historyJson = await historyResponse.json();
-      if (historyJson.error) {
-        console.error("Error refreshing history:", historyJson.error);
-        return;
-      }
-      setHistoryItems(historyJson.history ?? []);
-    } catch (error) {
-      console.error("Error saving to history:", error);
-    }
-  }, [userStoryData]);
-
-  const handleLoadStory = useCallback((data: UserStoryData) => {
-    const storyWithId = { ...data, storyId: data.storyId || generateStoryId() };
-    if (data.type === "story") {
-      setStoryData(storyWithId);
-    } else {
-      setBugData(storyWithId);
-    }
-    setCurrentType(data.type);
-    localStorage.setItem("userstory_selected_type", data.type);
-    setActiveTab("form");
-    localStorage.setItem("userstory_active_tab", "form");
-  }, []);
-
-  const handleAIGenerate = useCallback((data: UserStoryData) => {
-    const storyWithId = { ...data, storyId: data.storyId || generateStoryId() };
-    if (data.type === "story") {
-      setStoryData(storyWithId);
-    } else {
-      setBugData(storyWithId);
-    }
-    setCurrentType(data.type);
-    localStorage.setItem("userstory_selected_type", data.type);
-    setActiveTab("form");
-    localStorage.setItem("userstory_active_tab", "form");
-  }, []);
+  const {
+    isAuthenticated,
+    completePasswordLogin,
+    isBootstrapping,
+    isSaving,
+    activeTab,
+    setActiveTab,
+    userStoryData,
+    historyItems,
+    setHistoryItems,
+    aiPrompt,
+    setAiPrompt,
+    handleDataChange,
+    handleTypeChange,
+    handleClear,
+    handleSaveToHistory,
+    handleLoadStory,
+    handleAIGenerate,
+  } = useUserStoryCreator();
 
   if (!isAuthenticated) {
     return (
-      <PasswordGate
-        onAuthenticated={() => {
-          setIsAuthenticated(true);
-          setIsBootstrapping(true);
-        }}
-      />
+      <PasswordGate onAuthenticated={completePasswordLogin} />
     );
   }
 
   if (isBootstrapping) {
     return (
-      <div className="bg-zinc-50 dark:bg-zinc-950 py-12 px-4 min-h-[50vh] flex items-center justify-center">
-        <p className="text-zinc-600 dark:text-zinc-400" role="status">
+      <div className="flex min-h-[50vh] items-center justify-center px-5 py-16">
+        <p className="text-[15px] text-[#a1a1a6]" role="status">
           Loading your saved work…
         </p>
       </div>
@@ -375,68 +49,72 @@ export function UserStoryCreator() {
   }
 
   return (
-    <div className="bg-zinc-50 dark:bg-zinc-950 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="px-5 py-14 sm:py-16">
+      <div className="mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-8"
+          className="mb-6 text-center sm:text-left"
         >
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <div className="mb-3 flex flex-col items-center justify-between gap-3 sm:flex-row sm:items-end">
+            <h1 className="text-[34px] font-semibold leading-tight tracking-tight text-[#f5f5f7] sm:text-[40px]">
               User Story Creator
             </h1>
             {isSaving && (
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                Saving...
+              <span className="text-[13px] font-medium text-[#6e6e73]">
+                Saving…
               </span>
             )}
           </div>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Fill out the form below to create a user story
+          <p className="mx-auto max-w-2xl text-[17px] leading-relaxed text-[#a1a1a6] sm:mx-0">
+            Craft clear stories and bug reports with a focused, minimal editor.
           </p>
         </motion.div>
 
-        <div className="mb-6 flex gap-2 border-b border-zinc-200 dark:border-zinc-800">
+        <div
+          className="apple-segment mb-4 flex w-full justify-center sm:inline-flex sm:w-auto"
+          role="tablist"
+          aria-label="Main sections"
+        >
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "form"}
             onClick={() => {
               setActiveTab("form");
               localStorage.setItem("userstory_active_tab", "form");
             }}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "form"
-                ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+            className={`apple-segment-btn flex-1 sm:flex-none ${
+              activeTab === "form" ? "apple-segment-btn-active" : ""
             }`}
           >
             Form
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "ai"}
             onClick={() => {
               setActiveTab("ai");
               localStorage.setItem("userstory_active_tab", "ai");
             }}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "ai"
-                ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+            className={`apple-segment-btn flex-1 sm:flex-none ${
+              activeTab === "ai" ? "apple-segment-btn-active" : ""
             }`}
           >
             AI Creation
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "history"}
             onClick={() => {
               setActiveTab("history");
               localStorage.setItem("userstory_active_tab", "history");
             }}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === "history"
-                ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+            className={`apple-segment-btn flex-1 sm:flex-none ${
+              activeTab === "history" ? "apple-segment-btn-active" : ""
             }`}
           >
             History
@@ -444,14 +122,14 @@ export function UserStoryCreator() {
         </div>
 
         {activeTab === "form" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
+              className="apple-panel p-6 sm:p-8"
             >
-              <h2 className="text-xl font-semibold mb-6 text-zinc-900 dark:text-zinc-100">
+              <h2 className="mb-6 text-[21px] font-semibold tracking-tight text-[#f5f5f7]">
                 Form
               </h2>
               <UserStoryForm
@@ -465,7 +143,7 @@ export function UserStoryCreator() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
+              className="apple-panel p-6 sm:p-8"
             >
               <UserStoryPreview
                 data={userStoryData}
@@ -479,7 +157,7 @@ export function UserStoryCreator() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
+            className="apple-panel p-6 sm:p-8"
           >
             <AICreation
               prompt={aiPrompt}
@@ -492,7 +170,7 @@ export function UserStoryCreator() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
+            className="apple-panel p-6 sm:p-8"
           >
             <History
               onLoadStory={handleLoadStory}

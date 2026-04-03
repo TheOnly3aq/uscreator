@@ -3,17 +3,16 @@
 import { UserStoryFormProps } from "@/types/userStoryComponents";
 import { UserStoryData } from "@/types/userStory";
 import { RichTextEditor } from "./RichTextEditor";
+import { StoryTypeSelect } from "./StoryTypeSelect";
+import { UserStoryFormStoryFields } from "./UserStoryFormStoryFields";
+import { UserStoryFormBugFields } from "./UserStoryFormBugFields";
+import { UserStoryExtraLists } from "./UserStoryExtraLists";
 
 /**
- * Form component for user story input fields
- * @param {UserStoryFormProps} props - Component props
- * @param {UserStoryData} props.data - Current user story data
- * @param {(data: UserStoryData) => void} props.onChange - Callback function called when form data changes
- * @param {(type: "story" | "bug") => void} props.onTypeChange - Callback function called when type changes
- * @returns {JSX.Element} The user story form component
+ * Form for editing user stories and bug reports (shared type selector and lists).
  */
 export function UserStoryForm({ data, onChange, onTypeChange }: UserStoryFormProps) {
-  const handleChange = (
+  const handleFieldChange = (
     field: keyof UserStoryData,
     value: string | string[]
   ) => {
@@ -21,306 +20,112 @@ export function UserStoryForm({ data, onChange, onTypeChange }: UserStoryFormPro
   };
 
   const handleAcceptanceCriteriaChange = (index: number, value: string) => {
-    const newCriteria = [...data.acceptanceCriteria];
-    newCriteria[index] = value;
-    handleChange("acceptanceCriteria", newCriteria);
+    const next = [...data.acceptanceCriteria];
+    next[index] = value;
+    handleFieldChange("acceptanceCriteria", next);
   };
 
   const addAcceptanceCriterion = () => {
-    handleChange("acceptanceCriteria", [...data.acceptanceCriteria, ""]);
+    handleFieldChange("acceptanceCriteria", [...data.acceptanceCriteria, ""]);
   };
 
   const removeAcceptanceCriterion = (index: number) => {
-    const newCriteria = data.acceptanceCriteria.filter((_, i) => i !== index);
-    handleChange("acceptanceCriteria", newCriteria);
+    handleFieldChange(
+      "acceptanceCriteria",
+      data.acceptanceCriteria.filter((_, i) => i !== index)
+    );
   };
 
   const handleTechnicalInfoChange = (index: number, value: string) => {
-    const newTechnicalInfo = [...data.technicalInfo];
-    newTechnicalInfo[index] = value;
-    handleChange("technicalInfo", newTechnicalInfo);
+    const next = [...data.technicalInfo];
+    next[index] = value;
+    handleFieldChange("technicalInfo", next);
   };
 
   const addTechnicalInfo = () => {
-    handleChange("technicalInfo", [...data.technicalInfo, ""]);
+    handleFieldChange("technicalInfo", [...data.technicalInfo, ""]);
   };
 
   const removeTechnicalInfo = (index: number) => {
-    const newTechnicalInfo = data.technicalInfo.filter((_, i) => i !== index);
-    handleChange("technicalInfo", newTechnicalInfo);
+    handleFieldChange(
+      "technicalInfo",
+      data.technicalInfo.filter((_, i) => i !== index)
+    );
+  };
+
+  const handleTypeSelect = async (newType: "story" | "bug") => {
+    if (onTypeChange) {
+      await onTypeChange(newType);
+    } else {
+      handleFieldChange("type", newType);
+    }
   };
 
   return (
     <div className="space-y-6">
       <div>
         <label
+          id="userstory-type-label"
           htmlFor="type"
-          className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+          className="mb-2 block text-[13px] font-semibold text-[#a1a1a6]"
         >
           Type
         </label>
-        <select
+        <StoryTypeSelect
           id="type"
+          listboxLabelledBy="userstory-type-label"
           value={data.type}
-          onChange={async (e) => {
-            const newType = e.target.value as "story" | "bug";
-            if (onTypeChange) {
-              await onTypeChange(newType);
-            } else {
-              handleChange("type", newType);
-            }
-          }}
-          className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-        >
-          <option value="story">Story</option>
-          <option value="bug">Bug</option>
-        </select>
+          onChange={handleTypeSelect}
+        />
       </div>
 
       <div>
         <label
           htmlFor="title"
-          className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+          className="mb-2 block text-[13px] font-semibold text-[#a1a1a6]"
         >
-          Title{" "}
-          <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
+          Title <span className="text-[#6e6e73]">(optional)</span>
         </label>
         <input
           id="title"
           type="text"
           value={data.title || ""}
-          onChange={(e) => handleChange("title", e.target.value)}
-          className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+          onChange={(e) => handleFieldChange("title", e.target.value)}
+          className="apple-field"
           placeholder="e.g., User Preference Saving Feature"
         />
       </div>
 
       {data.type === "bug" ? (
-        <>
-          <div>
-            <label
-              htmlFor="role"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              Title/Description
-            </label>
-            <input
-              id="role"
-              type="text"
-              value={data.role}
-              onChange={(e) => handleChange("role", e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-              placeholder="e.g., Users should be able to select the 'disabled' filter without being redirected"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="action"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              Scenario{" "}
-              <span className="text-zinc-500 dark:text-zinc-400">(steps)</span>
-            </label>
-            <RichTextEditor
-              value={data.action || ""}
-              onChange={(value) => handleChange("action", value)}
-              placeholder="e.g., - Log in and navigate to 'Agents' section.\n- Select the 'disabled' filter button."
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="benefit"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              Expected Result
-            </label>
-            <input
-              id="benefit"
-              type="text"
-              value={data.benefit}
-              onChange={(e) => handleChange("benefit", e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-              placeholder="e.g., The agents table should only show 'disabled' agents."
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="background"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              Actual Result
-            </label>
-            <RichTextEditor
-              value={data.background || ""}
-              onChange={(value) => handleChange("background", value)}
-              placeholder="e.g., The user is redirected to another page — this is an undefined 'Agent' page."
-            />
-          </div>
-        </>
+        <UserStoryFormBugFields data={data} onFieldChange={handleFieldChange} />
       ) : (
-        <>
-          <div>
-            <label
-              htmlFor="role"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              As a <span className="text-zinc-500 dark:text-zinc-400">(role)</span>
-            </label>
-            <input
-              id="role"
-              type="text"
-              value={data.role}
-              onChange={(e) => handleChange("role", e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-              placeholder="e.g., user, admin, developer"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="action"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              I want{" "}
-              <span className="text-zinc-500 dark:text-zinc-400">(action)</span>
-            </label>
-            <input
-              id="action"
-              type="text"
-              value={data.action}
-              onChange={(e) => handleChange("action", e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-              placeholder="e.g., to save my preferences"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="benefit"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              So that{" "}
-              <span className="text-zinc-500 dark:text-zinc-400">(benefit)</span>
-            </label>
-            <input
-              id="benefit"
-              type="text"
-              value={data.benefit}
-              onChange={(e) => handleChange("benefit", e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-              placeholder="e.g., I can have a personalized experience"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="background"
-              className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
-            >
-              Background/Context{" "}
-              <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
-            </label>
-            <RichTextEditor
-              value={data.background || ""}
-              onChange={(value) => handleChange("background", value)}
-              placeholder="Additional context or background information"
-            />
-          </div>
-        </>
+        <UserStoryFormStoryFields data={data} onFieldChange={handleFieldChange} />
       )}
 
       <div>
         <label
           htmlFor="additionalInfo"
-          className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+          className="mb-2 block text-[13px] font-semibold text-[#a1a1a6]"
         >
           Additional Information{" "}
-          <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
+          <span className="text-[#6e6e73]">(optional)</span>
         </label>
         <RichTextEditor
           value={data.additionalInfo || ""}
-          onChange={(value) => handleChange("additionalInfo", value)}
+          onChange={(value) => handleFieldChange("additionalInfo", value)}
           placeholder="Any additional information or notes"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-          Acceptance Criteria{" "}
-          <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
-        </label>
-        <div className="space-y-2">
-          {data.acceptanceCriteria.map((criterion, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                type="text"
-                value={criterion}
-                onChange={(e) =>
-                  handleAcceptanceCriteriaChange(index, e.target.value)
-                }
-                className="flex-1 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                placeholder={`Criterion ${index + 1}`}
-              />
-              {data.acceptanceCriteria.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeAcceptanceCriterion(index)}
-                  className="px-3 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={addAcceptanceCriterion}
-            className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 transition-colors text-sm"
-          >
-            + Add Criterion
-          </button>
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-          Technical Information{" "}
-          <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
-        </label>
-        <div className="space-y-2">
-          {data.technicalInfo.map((info, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                type="text"
-                value={info}
-                onChange={(e) => handleTechnicalInfoChange(index, e.target.value)}
-                className="flex-1 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                placeholder={`Technical info ${index + 1}`}
-              />
-              {data.technicalInfo.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeTechnicalInfo(index)}
-                  className="px-3 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={addTechnicalInfo}
-            className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 transition-colors text-sm"
-          >
-            + Add Technical Info
-          </button>
-        </div>
-      </div>
+      <UserStoryExtraLists
+        data={data}
+        onAcceptanceChange={handleAcceptanceCriteriaChange}
+        onAddAcceptance={addAcceptanceCriterion}
+        onRemoveAcceptance={removeAcceptanceCriterion}
+        onTechnicalChange={handleTechnicalInfoChange}
+        onAddTechnical={addTechnicalInfo}
+        onRemoveTechnical={removeTechnicalInfo}
+      />
     </div>
   );
 }
-

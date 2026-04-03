@@ -17,7 +17,7 @@ export function renderMarkdown(text: string): React.ReactNode {
         elements.push(
           <ul
             key={`list-${elements.length}`}
-            className="list-disc ml-6 mb-2 text-zinc-900 dark:text-zinc-100"
+            className="mb-2 ml-6 list-disc text-[#d1d1d6]"
           >
             {currentList}
           </ul>
@@ -26,7 +26,7 @@ export function renderMarkdown(text: string): React.ReactNode {
         elements.push(
           <ol
             key={`list-${elements.length}`}
-            className="list-decimal ml-6 mb-2 text-zinc-900 dark:text-zinc-100"
+            className="mb-2 ml-6 list-decimal text-[#d1d1d6]"
           >
             {currentList}
           </ol>
@@ -44,7 +44,7 @@ export function renderMarkdown(text: string): React.ReactNode {
       const content = line.slice(2, -2);
       elements.push(
         <div key={index} className="mb-2 mt-4 first:mt-0">
-          <strong className="font-bold text-zinc-900 dark:text-zinc-100">
+          <strong className="font-semibold text-[#f5f5f7]">
             {content}
           </strong>
         </div>
@@ -56,13 +56,13 @@ export function renderMarkdown(text: string): React.ReactNode {
         const boldText = line.slice(2, boldEnd);
         const restText = line.slice(boldEnd + 2);
         elements.push(
-          <div key={index} className="mb-2 text-zinc-900 dark:text-zinc-100">
+          <div key={index} className="mb-2 text-[#d1d1d6]">
             <strong className="font-bold">{boldText}</strong> {restText}
           </div>
         );
       } else {
         elements.push(
-          <div key={index} className="mb-2 text-zinc-900 dark:text-zinc-100">
+          <div key={index} className="mb-2 text-[#d1d1d6]">
             {line}
           </div>
         );
@@ -96,7 +96,7 @@ export function renderMarkdown(text: string): React.ReactNode {
     } else {
       flushList();
       elements.push(
-        <div key={index} className="mb-2 text-zinc-900 dark:text-zinc-100">
+        <div key={index} className="mb-2 text-[#d1d1d6]">
           {line}
         </div>
       );

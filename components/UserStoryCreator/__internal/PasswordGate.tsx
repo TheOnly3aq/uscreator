@@ -8,9 +8,7 @@ interface PasswordGateProps {
   onAuthenticated: () => void;
 }
 
-/**
- * Password protection component that gates access to the application
- */
+/** Password gate before accessing the app. */
 export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -52,7 +50,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="flex flex-1 items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 w-full"
+        className="flex w-full flex-1 items-center justify-center px-4"
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
@@ -60,14 +58,14 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
           transition={{ duration: 0.3 }}
           className="w-full max-w-md"
         >
-          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-8 border border-zinc-200 dark:border-zinc-800">
-            <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">
+          <div className="apple-panel p-8 sm:p-10">
+            <h1 className="mb-2 text-center text-[28px] font-semibold tracking-tight text-[#f5f5f7] sm:text-left">
               User Story Creator
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-              Please enter the password to continue
+            <p className="mb-8 text-center text-[15px] leading-relaxed text-[#a1a1a6] sm:text-left">
+              Enter the password to continue.
             </p>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <input
                   type="password"
@@ -76,15 +74,20 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
                     setPassword(e.target.value);
                     setError("");
                   }}
-                  className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                  placeholder="Enter password"
+                  className="apple-field"
+                  placeholder="Password"
+                  autoComplete="current-password"
                   autoFocus
+                  aria-invalid={error ? "true" : "false"}
+                  aria-describedby={error ? "password-error" : undefined}
                 />
                 {error && (
                   <motion.p
+                    id="password-error"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-2 text-sm text-red-500"
+                    className="mt-2 text-[13px] text-[#ff6961]"
+                    role="alert"
                   >
                     {error}
                   </motion.p>
@@ -93,9 +96,9 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white transition-colors font-medium"
+                className="apple-btn-primary w-full"
               >
-                {isLoading ? "Authenticating..." : "Continue"}
+                {isLoading ? "Signing in…" : "Continue"}
               </button>
             </form>
           </div>

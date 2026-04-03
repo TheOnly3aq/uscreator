@@ -28,7 +28,7 @@ export async function DELETE(request: NextRequest) {
 
     const db = getPool();
 
-    const [result] = await db.execute(
+    await db.execute(
       `DELETE FROM user_stories 
        WHERE id = ? AND session_id = ?`,
       [id, sessionId]

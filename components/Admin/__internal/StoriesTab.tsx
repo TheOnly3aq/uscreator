@@ -32,7 +32,7 @@ export function StoriesTab({
 
       <div className="space-y-4">
         {stories.length === 0 ? (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 border border-zinc-200 dark:border-zinc-800 text-center text-zinc-600 dark:text-zinc-400">
+          <div className="apple-panel p-12 text-center text-[15px] text-[#a1a1a6]">
             No stories found
           </div>
         ) : (

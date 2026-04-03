@@ -19,15 +19,7 @@ interface HistoryProps {
   onItemsChange: (items: HistoryItem[]) => void;
 }
 
-/**
- * History component that displays saved user stories
- * @param {HistoryProps} props - Component props
- * @param {(data: UserStoryData) => void} props.onLoadStory - Callback function to load a story
- * @param {HistoryItem[]} props.items - History entries (loaded by parent)
- * @param {(items: HistoryItem[]) => void} props.onItemsChange - Updates history when entries change
- *
- * @returns {JSX.Element} The history component
- */
+/** Saved stories list with load and delete actions. */
 export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -71,17 +63,18 @@ export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-red-600 dark:text-red-400">{error}</p>
+      <div className="py-12 text-center">
+        <p className="text-[15px] text-[#ff6961]">{error}</p>
       </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-zinc-600 dark:text-zinc-400">
-          No saved user stories yet. Start creating one in the Form tab!
+      <div className="py-12 text-center">
+        <p className="mx-auto max-w-md text-[15px] leading-relaxed text-[#a1a1a6]">
+          No saved stories yet. Create one in the Form tab, then copy or save to
+          history.
         </p>
       </div>
     );
@@ -89,8 +82,8 @@ export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-6 text-zinc-900 dark:text-zinc-100">
-        Saved User Stories
+      <h2 className="mb-8 text-[21px] font-semibold tracking-tight text-[#f5f5f7]">
+        Saved user stories
       </h2>
       <div className="space-y-4">
         {items.map((item) => {
@@ -109,39 +102,39 @@ export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
               key={item.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`border rounded-lg p-4 transition-colors ${
+              className={`rounded-[22px] border p-5 transition-colors ${
                 selectedId === item.id
-                  ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/20"
-                  : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                  ? "border-[#2997ff]/45 bg-[#2997ff]/[0.08]"
+                  : "border-white/[0.1] bg-white/[0.02] hover:border-white/[0.16]"
               }`}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   {item.data.title && (
-                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+                    <h3 className="mb-2 text-[17px] font-semibold text-[#f5f5f7]">
                       {item.data.title}
                     </h3>
                   )}
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
+                      className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
                         item.data.type === "bug"
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                          : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                          ? "bg-[#ff453a]/20 text-[#ff9a93]"
+                          : "bg-[#2997ff]/20 text-[#6eb9ff]"
                       }`}
                     >
                       {item.data.type === "bug" ? "Bug" : "Story"}
                     </span>
                     {item.data.isAiGenerated && (
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
+                      <span className="rounded-full bg-[#bf5af2]/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#d9a9ff]">
                         AI Generated
                       </span>
                     )}
-                    <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                    <div className="text-[13px] text-[#6e6e73]">
                       Updated: {formatDate(item.updatedAt)}
                     </div>
                   </div>
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <div className="text-[12px] text-[#6e6e73]">
                     Created: {formatDate(item.createdAt)}
                   </div>
                 </div>
@@ -149,21 +142,21 @@ export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
                   <button
                     type="button"
                     onClick={() => handleLoadStory(item)}
-                    className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors text-sm font-medium"
+                    className="apple-btn-primary apple-btn-compact"
                   >
                     Load
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(item.id)}
-                    className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors text-sm font-medium"
+                    className="apple-btn-danger apple-btn-compact"
                   >
                     Delete
                   </button>
                 </div>
               </div>
-              <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
-                <div className="text-sm leading-relaxed">
+              <div className="rounded-2xl border border-white/[0.08] bg-black/35 p-4">
+                <div className="text-[14px] leading-relaxed text-[#d1d1d6]">
                   {renderMarkdown(formattedStory)}
                 </div>
               </div>

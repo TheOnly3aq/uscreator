@@ -3,21 +3,20 @@ interface SessionFilterProps {
   onClear: () => void;
 }
 
-export function SessionFilter({ sessionId, onClear }: SessionFilterProps) {
+export const SessionFilter = ({ sessionId, onClear }: SessionFilterProps) => {
   return (
-    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-center justify-between">
-      <div>
-        <p className="text-sm text-blue-900 dark:text-blue-100">
-          Filtering by session: <span className="font-mono">{sessionId}</span>
-        </p>
-      </div>
+    <div className="apple-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-[14px] text-[#a1a1a6]">
+        Filtering by session:{" "}
+        <span className="font-mono text-[#f5f5f7]">{sessionId}</span>
+      </p>
       <button
+        type="button"
         onClick={onClear}
-        className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+        className="apple-btn-secondary apple-btn-compact self-start sm:self-auto"
       >
         Clear filter
       </button>
     </div>
   );
-}
-
+};

@@ -6,14 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { RichTextEditorProps } from "@/types/userStoryComponents";
 
-/**
- * Rich text editor component with formatting and list editing features
- * @param {RichTextEditorProps} props - Component props
- * @param {string} props.value - Current HTML content value
- * @param {(value: string) => void} props.onChange - Callback function called when content changes
- * @param {string} [props.placeholder] - Placeholder text to display when editor is empty
- * @returns {JSX.Element | null} The rich text editor component or null if editor is not initialized
- */
+/** TipTap-based editor with bold, italic, and lists. */
 export function RichTextEditor({
   value,
   onChange,
@@ -34,7 +27,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm max-w-none focus:outline-none px-4 py-2 min-h-[100px] text-zinc-900 dark:text-zinc-100",
+          "max-w-none min-h-[100px] px-4 py-2 text-[15px] leading-relaxed text-[#d1d1d6] focus:outline-none",
       },
     },
   });
@@ -66,15 +59,15 @@ export function RichTextEditor({
   };
 
   return (
-    <div className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-400">
-      <div className="flex gap-1 p-2 border-b border-zinc-200 dark:border-zinc-800">
+    <div className="w-full overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] focus-within:border-[#2997ff]/45 focus-within:ring-2 focus-within:ring-[#2997ff]/20">
+      <div className="flex gap-1 border-b border-white/[0.08] p-2">
         <button
           type="button"
           onClick={toggleBold}
-          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+          className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
             editor.isActive("bold")
-              ? "bg-blue-500 text-white"
-              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              ? "bg-[#2997ff] text-white"
+              : "bg-white/[0.06] text-[#d1d1d6] hover:bg-white/[0.1]"
           }`}
           title="Bold"
         >
@@ -83,10 +76,10 @@ export function RichTextEditor({
         <button
           type="button"
           onClick={toggleItalic}
-          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+          className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
             editor.isActive("italic")
-              ? "bg-blue-500 text-white"
-              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              ? "bg-[#2997ff] text-white"
+              : "bg-white/[0.06] text-[#d1d1d6] hover:bg-white/[0.1]"
           }`}
           title="Italic"
         >
@@ -95,10 +88,10 @@ export function RichTextEditor({
         <button
           type="button"
           onClick={toggleBulletList}
-          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+          className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
             editor.isActive("bulletList")
-              ? "bg-blue-500 text-white"
-              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              ? "bg-[#2997ff] text-white"
+              : "bg-white/[0.06] text-[#d1d1d6] hover:bg-white/[0.1]"
           }`}
           title="Bullet List"
         >
@@ -107,10 +100,10 @@ export function RichTextEditor({
         <button
           type="button"
           onClick={toggleOrderedList}
-          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+          className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
             editor.isActive("orderedList")
-              ? "bg-blue-500 text-white"
-              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              ? "bg-[#2997ff] text-white"
+              : "bg-white/[0.06] text-[#d1d1d6] hover:bg-white/[0.1]"
           }`}
           title="Numbered List"
         >
@@ -133,12 +126,9 @@ export function RichTextEditor({
         .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           float: left;
-          color: rgb(161 161 170);
+          color: rgb(110 110 115);
           pointer-events: none;
           height: 0;
-        }
-        .dark .ProseMirror p.is-editor-empty:first-child::before {
-          color: rgb(113 113 122);
         }
         .ProseMirror ul {
           list-style-type: disc;

@@ -5,44 +5,40 @@ interface OverviewTabProps {
   stats: OverallStats;
 }
 
-function formatDate(dateString: string | null) {
+const formatDate = (dateString: string | null) => {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleString();
-}
+};
 
 /**
  * Overview tab component displaying statistics and activity timeline
  * @param {OverviewTabProps} props - Component props
  * @param {OverallStats} props.stats - Overall statistics data
  */
-export function OverviewTab({ stats }: OverviewTabProps) {
+export const OverviewTab = ({ stats }: OverviewTabProps) => {
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Stories" value={stats.totalStories} />
         <StatCard title="Unique Sessions" value={stats.uniqueSessions} />
         <StatCard title="Saved Stories" value={stats.totalSaved} />
         <StatCard title="Drafts" value={stats.totalDrafts} />
       </div>
 
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6 border border-zinc-200 dark:border-zinc-800">
-        <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-100">
-          Activity Timeline
+      <div className="apple-panel p-8">
+        <h2 className="mb-6 text-[19px] font-semibold text-[#f5f5f7]">
+          Activity
         </h2>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-zinc-600 dark:text-zinc-400">
-              First Story:
-            </span>
-            <span className="text-zinc-900 dark:text-zinc-100">
+        <div className="space-y-4 text-[15px]">
+          <div className="flex justify-between gap-4 border-b border-white/[0.06] pb-4">
+            <span className="text-[#a1a1a6]">First story</span>
+            <span className="text-right text-[#f5f5f7]">
               {formatDate(stats.firstStoryDate)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-zinc-600 dark:text-zinc-400">
-              Last Activity:
-            </span>
-            <span className="text-zinc-900 dark:text-zinc-100">
+          <div className="flex justify-between gap-4">
+            <span className="text-[#a1a1a6]">Last activity</span>
+            <span className="text-right text-[#f5f5f7]">
               {formatDate(stats.lastActivityDate)}
             </span>
           </div>
@@ -50,4 +46,4 @@ export function OverviewTab({ stats }: OverviewTabProps) {
       </div>
     </div>
   );
-}
+};

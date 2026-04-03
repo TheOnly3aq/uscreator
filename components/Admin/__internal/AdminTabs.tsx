@@ -11,20 +11,19 @@ interface AdminTabsProps {
  * @param {AdminTab} props.activeTab - Currently active tab
  * @param {(tab: AdminTab) => void} props.onTabChange - Callback function when tab changes
  */
-export function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
+export const AdminTabs = ({ activeTab, onTabChange }: AdminTabsProps) => {
   const tabs: AdminTab[] = ["overview", "sessions", "stories"];
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6">
-      <div className="flex gap-4">
+    <div className="border-b border-white/[0.08] bg-black/30 px-6 py-3">
+      <div className="apple-segment flex w-full max-w-xl">
         {tabs.map((tab) => (
           <button
             key={tab}
+            type="button"
             onClick={() => onTabChange(tab)}
-            className={`px-4 py-2 border-b-2 transition-colors font-medium ${
-              activeTab === tab
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+            className={`apple-segment-btn flex-1 ${
+              activeTab === tab ? "apple-segment-btn-active" : ""
             }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -33,5 +32,4 @@ export function AdminTabs({ activeTab, onTabChange }: AdminTabsProps) {
       </div>
     </div>
   );
-}
-
+};

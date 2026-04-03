@@ -87,7 +87,7 @@ Remember: Only extract and use information that is actually provided above. Leav
         "Content-Type": "application/json",
         "Authorization": `Bearer ${openRouterApiKey}`,
         "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-        "X-Title": "User Story Creator",
+        "X-Title": "StoryFlow",
       },
       body: JSON.stringify({
         model: "anthropic/claude-haiku-4.5",

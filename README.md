@@ -1,9 +1,9 @@
-# User Story Creator
+# StoryFlow
 
 A lightweight web application for creating and formatting user stories. Fill out a simple form and generate properly formatted user stories that you can copy and use in your project documentation.
 
 ## What It Does
-The User Story Creator provides a clean interface to build user stories with the following structure:
+The StoryFlow provides a clean interface to build user stories with the following structure:
 
 - **As a** [role] **I want** [action] **So that** [benefit]
 - Background/Context (optional)

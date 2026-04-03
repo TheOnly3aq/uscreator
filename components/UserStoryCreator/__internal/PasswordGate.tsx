@@ -60,7 +60,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
         >
           <div className="uscreator-panel p-8 sm:p-10">
             <h1 className="mb-2 text-center text-[28px] font-semibold tracking-tight text-[#f5f5f7] sm:text-left">
-              User Story Creator
+              StoryFlow
             </h1>
             <p className="mb-8 text-center text-[15px] leading-relaxed text-[#a1a1a6] sm:text-left">
               Enter the password to continue.

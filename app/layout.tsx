@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "User Story Creator",
+  title: "StoryFlow",
   description: "Create and format user stories with ease",
   icons: {
     icon: [

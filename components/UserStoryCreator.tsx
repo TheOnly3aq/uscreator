@@ -9,7 +9,7 @@ import { AICreation } from "./UserStoryCreator/__internal/AICreation";
 import { useUserStoryCreator } from "./UserStoryCreator/useUserStoryCreator";
 
 /**
- * Main user story creator: authentication, tabs, form, AI flow, and history.
+ * Main StoryFlow: authentication, tabs, form, AI flow, and history.
  */
 export function UserStoryCreator() {
   const {
@@ -57,7 +57,7 @@ export function UserStoryCreator() {
         >
           <div className="mb-3 flex flex-col items-center justify-between gap-3 sm:flex-row sm:items-end">
             <h1 className="text-[34px] font-semibold leading-tight tracking-tight text-[#f5f5f7] sm:text-[40px]">
-              User Story Creator
+              StoryFlow
             </h1>
             {isSaving && (
               <span className="text-[13px] font-medium text-[#6e6e73]">

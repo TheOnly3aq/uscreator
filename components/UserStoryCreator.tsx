@@ -17,7 +17,10 @@ import {
 import { PasswordGate } from "./UserStoryCreator/__internal/PasswordGate";
 import { UserStoryForm } from "./UserStoryCreator/__internal/UserStoryForm";
 import { UserStoryPreview } from "./UserStoryCreator/__internal/UserStoryPreview";
-import { History } from "./UserStoryCreator/__internal/History";
+import {
+  History,
+  type HistoryItem,
+} from "./UserStoryCreator/__internal/History";
 import { AICreation } from "./UserStoryCreator/__internal/AICreation";
 
 /**
@@ -49,6 +52,9 @@ export function UserStoryCreator() {
     technicalInfo: [""],
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isBootstrapping, setIsBootstrapping] = useState(false);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [aiPrompt, setAiPrompt] = useState("");
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasInitializedRef = useRef(false);
   const isTypeChangingRef = useRef(false);
@@ -56,7 +62,32 @@ export function UserStoryCreator() {
   const userStoryData = currentType === "story" ? storyData : bugData;
 
   useEffect(() => {
+    if (getCookie() !== "authenticated") {
+      return;
+    }
+    startTransition(() => {
+      setIsAuthenticated(true);
+      setIsBootstrapping(true);
+      const savedTab = localStorage.getItem("userstory_active_tab");
+      if (
+        savedTab &&
+        (savedTab === "form" || savedTab === "history" || savedTab === "ai")
+      ) {
+        setActiveTab(savedTab as "form" | "history" | "ai");
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+    if (hasInitializedRef.current) {
+      return;
+    }
+
     const initializeSession = async () => {
+      setIsBootstrapping(true);
       try {
         const existingSessionId = getSessionId();
         if (!existingSessionId) {
@@ -72,13 +103,25 @@ export function UserStoryCreator() {
           savedType === "bug" || savedType === "story" ? savedType : "story";
         setCurrentType(initialType);
 
-        const [storyResponse, bugResponse] = await Promise.all([
+        const [
+          storyResponse,
+          bugResponse,
+          promptResponse,
+          historyResponse,
+        ] = await Promise.all([
           fetch("/api/user-stories/latest/?type=story"),
           fetch("/api/user-stories/latest/?type=bug"),
+          fetch("/api/user-stories/ai-prompt"),
+          fetch("/api/user-stories/history/"),
         ]);
 
-        const storyResult = await storyResponse.json();
-        const bugResult = await bugResponse.json();
+        const [storyResult, bugResult, promptResult, historyResult] =
+          await Promise.all([
+            storyResponse.json(),
+            bugResponse.json(),
+            promptResponse.json(),
+            historyResponse.json(),
+          ]);
 
         if (storyResult.data) {
           setStoryData(storyResult.data);
@@ -92,30 +135,28 @@ export function UserStoryCreator() {
           setBugData(createEmptyUserStoryData("bug"));
         }
 
+        if (typeof promptResult?.prompt === "string") {
+          setAiPrompt(promptResult.prompt);
+        }
+
+        if (historyResult.error) {
+          console.error("History bootstrap:", historyResult.error);
+          setHistoryItems([]);
+        } else {
+          setHistoryItems(historyResult.history ?? []);
+        }
+
         hasInitializedRef.current = true;
       } catch (error) {
         console.error("Error initializing session:", error);
         hasInitializedRef.current = true;
+      } finally {
+        setIsBootstrapping(false);
       }
     };
 
-    const cookie = getCookie();
-    if (cookie === "authenticated") {
-      startTransition(() => {
-        setIsAuthenticated(true);
-        const savedTab = localStorage.getItem("userstory_active_tab");
-        if (
-          savedTab &&
-          (savedTab === "form" || savedTab === "history" || savedTab === "ai")
-        ) {
-          setActiveTab(savedTab as "form" | "history" | "ai");
-        }
-      });
-      if (!hasInitializedRef.current) {
-        initializeSession();
-      }
-    }
-  }, []);
+    void initializeSession();
+  }, [isAuthenticated]);
 
   const saveUserStory = useCallback(async (data: UserStoryData) => {
     if (!hasUserStoryContent(data)) {
@@ -253,13 +294,23 @@ export function UserStoryCreator() {
     }
 
     try {
-      await fetch("/api/user-stories/save-history/", {
+      const saveResponse = await fetch("/api/user-stories/save-history/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userStoryData),
       });
+      if (!saveResponse.ok) {
+        return;
+      }
+      const historyResponse = await fetch("/api/user-stories/history/");
+      const historyJson = await historyResponse.json();
+      if (historyJson.error) {
+        console.error("Error refreshing history:", historyJson.error);
+        return;
+      }
+      setHistoryItems(historyJson.history ?? []);
     } catch (error) {
       console.error("Error saving to history:", error);
     }
@@ -290,7 +341,24 @@ export function UserStoryCreator() {
   }, []);
 
   if (!isAuthenticated) {
-    return <PasswordGate onAuthenticated={() => setIsAuthenticated(true)} />;
+    return (
+      <PasswordGate
+        onAuthenticated={() => {
+          setIsAuthenticated(true);
+          setIsBootstrapping(true);
+        }}
+      />
+    );
+  }
+
+  if (isBootstrapping) {
+    return (
+      <div className="bg-zinc-50 dark:bg-zinc-950 py-12 px-4 min-h-[50vh] flex items-center justify-center">
+        <p className="text-zinc-600 dark:text-zinc-400" role="status">
+          Loading your saved work…
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -338,16 +406,13 @@ export function UserStoryCreator() {
               setActiveTab("ai");
               localStorage.setItem("userstory_active_tab", "ai");
             }}
-            className={`px-4 py-2 font-medium transition-colors relative ${
+            className={`px-4 py-2 font-medium transition-colors ${
               activeTab === "ai"
                 ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
                 : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
             }`}
           >
             AI Creation
-            <span className="absolute -top-1 -right-1 text-[10px] font-bold px-1.5 py-0.5 bg-blue-500 text-white rounded transform rotate-12">
-              NEW
-            </span>
           </button>
           <button
             type="button"
@@ -403,7 +468,11 @@ export function UserStoryCreator() {
             transition={{ duration: 0.4 }}
             className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
           >
-            <AICreation onGenerate={handleAIGenerate} />
+            <AICreation
+              prompt={aiPrompt}
+              onPromptChange={setAiPrompt}
+              onGenerate={handleAIGenerate}
+            />
           </motion.div>
         ) : (
           <motion.div
@@ -412,7 +481,11 @@ export function UserStoryCreator() {
             transition={{ duration: 0.4 }}
             className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-6 border border-zinc-200 dark:border-zinc-800"
           >
-            <History onLoadStory={handleLoadStory} />
+            <History
+              onLoadStory={handleLoadStory}
+              items={historyItems}
+              onItemsChange={setHistoryItems}
+            />
           </motion.div>
         )}
       </div>

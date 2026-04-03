@@ -1,59 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { UserStoryData } from "@/types/userStory";
 import { formatUserStory } from "@/utils/userStoryFormatter";
 import { renderMarkdown } from "@/utils/markdownRenderer";
 import { motion } from "framer-motion";
 
-interface HistoryItem {
+export interface HistoryItem {
   id: number;
   data: UserStoryData;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 interface HistoryProps {
   onLoadStory: (data: UserStoryData) => void;
+  items: HistoryItem[];
+  onItemsChange: (items: HistoryItem[]) => void;
 }
 
 /**
  * History component that displays saved user stories
  * @param {HistoryProps} props - Component props
  * @param {(data: UserStoryData) => void} props.onLoadStory - Callback function to load a story
- * 
+ * @param {HistoryItem[]} props.items - History entries (loaded by parent)
+ * @param {(items: HistoryItem[]) => void} props.onItemsChange - Updates history when entries change
+ *
  * @returns {JSX.Element} The history component
  */
-export function History({ onLoadStory }: HistoryProps) {
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
-  const loadHistory = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/user-stories/history/");
-      const { history: historyData, error: errorMessage } =
-        await response.json();
-
-      if (errorMessage) {
-        setError(errorMessage);
-      } else {
-        setHistory(historyData || []);
-      }
-    } catch (err) {
-      setError("Failed to load history");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadHistory();
-  }, []);
 
   const formatDate = (date: Date | string) => {
     const d = typeof date === "string" ? new Date(date) : date;
@@ -78,7 +55,7 @@ export function History({ onLoadStory }: HistoryProps) {
       });
 
       if (response.ok) {
-        setHistory((prev) => prev.filter((item) => item.id !== itemId));
+        onItemsChange(items.filter((item) => item.id !== itemId));
         if (selectedId === itemId) {
           setSelectedId(null);
         }
@@ -92,14 +69,6 @@ export function History({ onLoadStory }: HistoryProps) {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-zinc-600 dark:text-zinc-400">Loading history...</p>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="text-center py-12">
@@ -108,7 +77,7 @@ export function History({ onLoadStory }: HistoryProps) {
     );
   }
 
-  if (history.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-zinc-600 dark:text-zinc-400">
@@ -124,7 +93,7 @@ export function History({ onLoadStory }: HistoryProps) {
         Saved User Stories
       </h2>
       <div className="space-y-4">
-        {history.map((item) => {
+        {items.map((item) => {
           const formattedStory = formatUserStory(item.data);
           const hasContent =
             item.data.role.trim() ||

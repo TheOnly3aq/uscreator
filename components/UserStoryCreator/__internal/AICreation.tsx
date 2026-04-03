@@ -6,6 +6,9 @@ import { UserStoryData } from "@/types/userStory";
 
 interface AICreationProps {
   onGenerate: (data: UserStoryData) => void;
+  /** AI prompt text (owned by parent so it survives tab switches and is prefetched on load). */
+  prompt: string;
+  onPromptChange: (value: string) => void;
 }
 
 /**
@@ -14,8 +17,11 @@ interface AICreationProps {
  * @param {(data: UserStoryData) => void} props.onGenerate - Callback function called when AI generates data
  * @returns {JSX.Element} The AI creation component
  */
-export function AICreation({ onGenerate }: AICreationProps) {
-  const [prompt, setPrompt] = useState("");
+export function AICreation({
+  onGenerate,
+  prompt,
+  onPromptChange,
+}: AICreationProps) {
   const [type, setType] = useState<"story" | "bug">("story");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,24 +101,6 @@ export function AICreation({ onGenerate }: AICreationProps) {
   };
 
   useEffect(() => {
-    const loadPrompt = async () => {
-      try {
-        const response = await fetch("/api/user-stories/ai-prompt");
-        if (response.ok) {
-          const result = await response.json();
-          if (result.prompt) {
-            setPrompt(result.prompt);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load prompt:", err);
-      }
-    };
-
-    loadPrompt();
-  }, []);
-
-  useEffect(() => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -146,7 +134,7 @@ export function AICreation({ onGenerate }: AICreationProps) {
       });
 
       if (response.ok) {
-        setPrompt("");
+        onPromptChange("");
       } else {
         throw new Error("Failed to clear prompt");
       }
@@ -231,7 +219,7 @@ export function AICreation({ onGenerate }: AICreationProps) {
         <textarea
           id="ai-prompt"
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={(e) => onPromptChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isGenerating}
           rows={6}

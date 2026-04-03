@@ -12,7 +12,11 @@ export function Footer() {
               My by KT
             </span>
             <span className="hidden sm:inline">•</span>
-            <span>© Copyright 2025</span>
+            <span>© Copyright 2026</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-300">
+              v1.2.6
+            </span>
           </div>
         </div>
       </div>

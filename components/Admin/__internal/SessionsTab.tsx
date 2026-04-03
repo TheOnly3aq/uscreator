@@ -48,7 +48,7 @@ export function SessionsTab({
   };
   return (
     <div className="space-y-4">
-      <div className="apple-panel overflow-hidden">
+      <div className="uscreator-panel overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-white/[0.04]">
@@ -109,9 +109,7 @@ export function SessionsTab({
                         {stat.userAgent}
                       </span>
                     ) : (
-                      <span className="text-[#6e6e73]">
-                        N/A
-                      </span>
+                      <span className="text-[#6e6e73]">N/A</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-[13px] text-[#a1a1a6]">
@@ -124,9 +122,7 @@ export function SessionsTab({
                         ))}
                       </div>
                     ) : (
-                      <span className="text-[#6e6e73]">
-                        N/A
-                      </span>
+                      <span className="text-[#6e6e73]">N/A</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-[13px] text-[#a1a1a6]">
@@ -140,7 +136,7 @@ export function SessionsTab({
                       <button
                         type="button"
                         onClick={() => onViewStories(stat.sessionId)}
-                        className="apple-link text-[13px] font-semibold no-underline hover:underline"
+                        className="uscreator-link text-[13px] font-semibold no-underline hover:underline"
                       >
                         View stories
                       </button>

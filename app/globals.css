@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Dark-only, Apple-inspired tokens (no Apple trademarks or assets) */
+/* Dark-only, uscreator-inspired tokens (no uscreator trademarks or assets) */
 @theme inline {
   --color-background: #000000;
   --color-foreground: #f5f5f7;
@@ -10,7 +10,7 @@
   --color-accent: #2997ff;
   --color-accent-hover: #147ce5;
   --color-border-subtle: rgba(255, 255, 255, 0.12);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -uscreator-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
@@ -35,57 +35,57 @@ body {
 }
 
 @layer components {
-  .apple-panel {
+  .uscreator-panel {
     @apply rounded-[28px] border border-white/[0.12] bg-white/[0.04] backdrop-blur-2xl shadow-[0_24px_80px_rgba(0,0,0,0.55)];
   }
 
-  .apple-btn-primary {
+  .uscreator-btn-primary {
     @apply inline-flex min-h-[44px] items-center justify-center rounded-full px-6 text-sm font-semibold text-white transition-all duration-200;
     @apply bg-[#2997ff] hover:bg-[#147ce5] active:scale-[0.98];
     @apply disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#2997ff] disabled:active:scale-100;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2997ff]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
-  .apple-btn-secondary {
+  .uscreator-btn-secondary {
     @apply inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/[0.18] bg-white/[0.06] px-6 text-sm font-semibold text-[#f5f5f7] transition-all duration-200;
     @apply hover:bg-white/[0.11] active:scale-[0.98];
     @apply disabled:cursor-not-allowed disabled:opacity-40;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
-  .apple-btn-danger {
+  .uscreator-btn-danger {
     @apply inline-flex min-h-[40px] items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition-all duration-200;
     @apply bg-[#ff453a]/90 hover:bg-[#ff453a] active:scale-[0.98];
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6961]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
-  .apple-btn-compact {
+  .uscreator-btn-compact {
     @apply inline-flex min-h-[36px] items-center justify-center rounded-full px-4 text-[13px] font-semibold transition-all duration-200;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2997ff]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
-  .apple-field {
+  .uscreator-field {
     @apply w-full rounded-2xl border border-white/[0.12] bg-white/[0.05] px-4 py-3 text-[15px] leading-snug text-[#f5f5f7] shadow-inner shadow-black/20 outline-none transition-[border-color,box-shadow] duration-200;
     @apply placeholder:text-[#6e6e73];
     @apply focus:border-[#2997ff]/55 focus:ring-2 focus:ring-[#2997ff]/25;
     @apply disabled:cursor-not-allowed disabled:opacity-45;
   }
 
-  .apple-segment {
+  .uscreator-segment {
     @apply rounded-full bg-white/[0.08] p-1 ring-1 ring-white/[0.08];
   }
 
-  .apple-segment-btn {
+  .uscreator-segment-btn {
     @apply rounded-full px-5 py-2 text-[13px] font-semibold text-[#a1a1a6] transition-all duration-200;
     @apply hover:text-[#f5f5f7];
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2997ff]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1d1d1f];
   }
 
-  .apple-segment-btn-active {
+  .uscreator-segment-btn-active {
     @apply bg-white/[0.16] text-[#f5f5f7] shadow-sm shadow-black/30;
   }
 
-  .apple-link {
+  .uscreator-link {
     @apply text-[#2997ff] underline-offset-4 transition-colors hover:text-[#6eb9ff] hover:underline;
   }
 }

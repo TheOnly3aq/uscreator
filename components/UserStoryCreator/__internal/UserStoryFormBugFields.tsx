@@ -5,10 +5,7 @@ import { RichTextEditor } from "./RichTextEditor";
 
 type Props = {
   data: UserStoryData;
-  onFieldChange: (
-    field: keyof UserStoryData,
-    value: string | string[]
-  ) => void;
+  onFieldChange: (field: keyof UserStoryData, value: string | string[]) => void;
 };
 
 export const UserStoryFormBugFields = ({ data, onFieldChange }: Props) => {
@@ -26,7 +23,7 @@ export const UserStoryFormBugFields = ({ data, onFieldChange }: Props) => {
           type="text"
           value={data.role}
           onChange={(e) => onFieldChange("role", e.target.value)}
-          className="apple-field"
+          className="uscreator-field"
           placeholder="e.g., Users should be able to select the 'disabled' filter without being redirected"
         />
       </div>
@@ -57,7 +54,7 @@ export const UserStoryFormBugFields = ({ data, onFieldChange }: Props) => {
           type="text"
           value={data.benefit}
           onChange={(e) => onFieldChange("benefit", e.target.value)}
-          className="apple-field"
+          className="uscreator-field"
           placeholder="e.g., The agents table should only show 'disabled' agents."
         />
       </div>

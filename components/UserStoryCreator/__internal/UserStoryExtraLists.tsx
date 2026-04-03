@@ -25,8 +25,7 @@ export const UserStoryExtraLists = ({
     <>
       <div>
         <label className="mb-2 block text-[13px] font-semibold text-[#a1a1a6]">
-          Acceptance Criteria{" "}
-          <span className="text-[#6e6e73]">(optional)</span>
+          Acceptance Criteria <span className="text-[#6e6e73]">(optional)</span>
         </label>
         <div className="space-y-2">
           {data.acceptanceCriteria.map((criterion, index) => (
@@ -35,14 +34,14 @@ export const UserStoryExtraLists = ({
                 type="text"
                 value={criterion}
                 onChange={(e) => onAcceptanceChange(index, e.target.value)}
-                className="apple-field flex-1"
+                className="uscreator-field flex-1"
                 placeholder={`Criterion ${index + 1}`}
               />
               {data.acceptanceCriteria.length > 1 && (
                 <button
                   type="button"
                   onClick={() => onRemoveAcceptance(index)}
-                  className="apple-btn-compact shrink-0 bg-[#ff453a]/90 px-4 text-white hover:bg-[#ff453a]"
+                  className="uscreator-btn-compact shrink-0 bg-[#ff453a]/90 px-4 text-white hover:bg-[#ff453a]"
                 >
                   Remove
                 </button>
@@ -52,7 +51,7 @@ export const UserStoryExtraLists = ({
           <button
             type="button"
             onClick={onAddAcceptance}
-            className="apple-btn-secondary apple-btn-compact w-full sm:w-auto"
+            className="uscreator-btn-secondary uscreator-btn-compact w-full sm:w-auto"
           >
             + Add Criterion
           </button>
@@ -71,14 +70,14 @@ export const UserStoryExtraLists = ({
                 type="text"
                 value={info}
                 onChange={(e) => onTechnicalChange(index, e.target.value)}
-                className="apple-field flex-1"
+                className="uscreator-field flex-1"
                 placeholder={`Technical info ${index + 1}`}
               />
               {data.technicalInfo.length > 1 && (
                 <button
                   type="button"
                   onClick={() => onRemoveTechnical(index)}
-                  className="apple-btn-compact shrink-0 bg-[#ff453a]/90 px-4 text-white hover:bg-[#ff453a]"
+                  className="uscreator-btn-compact shrink-0 bg-[#ff453a]/90 px-4 text-white hover:bg-[#ff453a]"
                 >
                   Remove
                 </button>
@@ -88,7 +87,7 @@ export const UserStoryExtraLists = ({
           <button
             type="button"
             onClick={onAddTechnical}
-            className="apple-btn-secondary apple-btn-compact w-full sm:w-auto"
+            className="uscreator-btn-secondary uscreator-btn-compact w-full sm:w-auto"
           >
             + Add Technical Info
           </button>

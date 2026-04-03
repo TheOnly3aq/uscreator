@@ -25,7 +25,7 @@ export const OverviewTab = ({ stats }: OverviewTabProps) => {
         <StatCard title="Drafts" value={stats.totalDrafts} />
       </div>
 
-      <div className="apple-panel p-8">
+      <div className="uscreator-panel p-8">
         <h2 className="mb-6 text-[19px] font-semibold text-[#f5f5f7]">
           Activity
         </h2>

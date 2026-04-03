@@ -58,7 +58,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
           transition={{ duration: 0.3 }}
           className="w-full max-w-md"
         >
-          <div className="apple-panel p-8 sm:p-10">
+          <div className="uscreator-panel p-8 sm:p-10">
             <h1 className="mb-2 text-center text-[28px] font-semibold tracking-tight text-[#f5f5f7] sm:text-left">
               User Story Creator
             </h1>
@@ -74,7 +74,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
                     setPassword(e.target.value);
                     setError("");
                   }}
-                  className="apple-field"
+                  className="uscreator-field"
                   placeholder="Password"
                   autoComplete="current-password"
                   autoFocus
@@ -96,7 +96,7 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="apple-btn-primary w-full"
+                className="uscreator-btn-primary w-full"
               >
                 {isLoading ? "Signing in…" : "Continue"}
               </button>

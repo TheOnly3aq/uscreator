@@ -35,7 +35,7 @@ export const StoryCard = ({ story, onDeleteStory }: StoryCardProps) => {
     }
   };
   return (
-    <div className="apple-panel p-6 sm:p-8">
+    <div className="uscreator-panel p-6 sm:p-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="mb-2 flex flex-wrap items-center gap-2">

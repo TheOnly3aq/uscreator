@@ -11,7 +11,7 @@ interface StatCardProps {
  */
 export const StatCard = ({ title, value }: StatCardProps) => {
   return (
-    <div className="apple-panel p-6">
+    <div className="uscreator-panel p-6">
       <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6e6e73]">
         {title}
       </div>

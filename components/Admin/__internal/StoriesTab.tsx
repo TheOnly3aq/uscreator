@@ -32,7 +32,7 @@ export function StoriesTab({
 
       <div className="space-y-4">
         {stories.length === 0 ? (
-          <div className="apple-panel p-12 text-center text-[15px] text-[#a1a1a6]">
+          <div className="uscreator-panel p-12 text-center text-[15px] text-[#a1a1a6]">
             No stories found
           </div>
         ) : (
@@ -50,4 +50,3 @@ export function StoriesTab({
     </div>
   );
 }
-

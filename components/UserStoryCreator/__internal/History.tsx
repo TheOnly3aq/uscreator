@@ -142,14 +142,14 @@ export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
                   <button
                     type="button"
                     onClick={() => handleLoadStory(item)}
-                    className="apple-btn-primary apple-btn-compact"
+                    className="uscreator-btn-primary uscreator-btn-compact"
                   >
                     Load
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(item.id)}
-                    className="apple-btn-danger apple-btn-compact"
+                    className="uscreator-btn-danger uscreator-btn-compact"
                   >
                     Delete
                   </button>
@@ -167,4 +167,3 @@ export function History({ onLoadStory, items, onItemsChange }: HistoryProps) {
     </div>
   );
 }
-

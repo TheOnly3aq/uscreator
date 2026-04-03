@@ -11,7 +11,11 @@ import { UserStoryExtraLists } from "./UserStoryExtraLists";
 /**
  * Form for editing user stories and bug reports (shared type selector and lists).
  */
-export function UserStoryForm({ data, onChange, onTypeChange }: UserStoryFormProps) {
+export function UserStoryForm({
+  data,
+  onChange,
+  onTypeChange,
+}: UserStoryFormProps) {
   const handleFieldChange = (
     field: keyof UserStoryData,
     value: string | string[]
@@ -91,7 +95,7 @@ export function UserStoryForm({ data, onChange, onTypeChange }: UserStoryFormPro
           type="text"
           value={data.title || ""}
           onChange={(e) => handleFieldChange("title", e.target.value)}
-          className="apple-field"
+          className="uscreator-field"
           placeholder="e.g., User Preference Saving Feature"
         />
       </div>
@@ -99,7 +103,10 @@ export function UserStoryForm({ data, onChange, onTypeChange }: UserStoryFormPro
       {data.type === "bug" ? (
         <UserStoryFormBugFields data={data} onFieldChange={handleFieldChange} />
       ) : (
-        <UserStoryFormStoryFields data={data} onFieldChange={handleFieldChange} />
+        <UserStoryFormStoryFields
+          data={data}
+          onFieldChange={handleFieldChange}
+        />
       )}
 
       <div>

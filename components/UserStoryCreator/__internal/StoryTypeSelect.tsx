@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 export type StoryKind = "story" | "bug";
 
@@ -153,7 +147,7 @@ export const StoryTypeSelect = ({
           });
         }}
         onKeyDown={handleTriggerKeyDown}
-        className="apple-field flex w-full items-center justify-between gap-3 text-left disabled:cursor-not-allowed disabled:opacity-50"
+        className="uscreator-field flex w-full items-center justify-between gap-3 text-left disabled:cursor-not-allowed disabled:opacity-50"
       >
         <span className="truncate">{selectedLabel}</span>
         <span
@@ -197,7 +191,9 @@ export const StoryTypeSelect = ({
                 aria-selected={isActive}
                 className={`cursor-pointer px-4 py-2.5 text-[15px] transition-colors ${
                   isHi ? "bg-white/[0.08]" : "bg-transparent"
-                } ${isActive ? "font-semibold text-[#f5f5f7]" : "text-[#d1d1d6]"}`}
+                } ${
+                  isActive ? "font-semibold text-[#f5f5f7]" : "text-[#d1d1d6]"
+                }`}
                 onMouseEnter={() => setHighlightIndex(index)}
                 onClick={() => void commit(opt.value)}
               >

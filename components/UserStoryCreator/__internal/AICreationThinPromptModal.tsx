@@ -39,7 +39,7 @@ export const AICreationThinPromptModal = ({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="apple-panel relative z-10 w-full max-w-md p-8"
+        className="uscreator-panel relative z-10 w-full max-w-md p-8"
         role="dialog"
         aria-modal="true"
         aria-labelledby="ai-thin-prompt-title"
@@ -80,7 +80,7 @@ export const AICreationThinPromptModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="apple-btn-primary flex-1"
+            className="uscreator-btn-primary flex-1"
             aria-label="Close modal"
           >
             Got it
@@ -89,7 +89,7 @@ export const AICreationThinPromptModal = ({
             type="button"
             onClick={onBypass}
             disabled={isGenerating}
-            className="apple-btn-danger apple-btn-compact flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+            className="uscreator-btn-danger uscreator-btn-compact flex-1 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Bypass prompt validation and generate anyway"
           >
             Bypass

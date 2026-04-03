@@ -91,7 +91,7 @@ export function AICreation({
           onKeyDown={handleKeyDown}
           disabled={isGenerating}
           rows={6}
-          className="apple-field min-h-[160px] resize-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="uscreator-field min-h-[160px] resize-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={
             type === "story"
               ? "e.g., Users should be able to save their preferences so they don't have to reconfigure settings every time they visit the site"
@@ -113,7 +113,7 @@ export function AICreation({
         type="button"
         onClick={() => void handleGenerate()}
         disabled={isGenerating || !prompt.trim()}
-        className="apple-btn-primary w-full"
+        className="uscreator-btn-primary w-full"
         aria-label="Generate user story with AI"
       >
         {isGenerating

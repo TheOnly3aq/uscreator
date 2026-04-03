@@ -5,10 +5,7 @@ import { RichTextEditor } from "./RichTextEditor";
 
 type Props = {
   data: UserStoryData;
-  onFieldChange: (
-    field: keyof UserStoryData,
-    value: string | string[]
-  ) => void;
+  onFieldChange: (field: keyof UserStoryData, value: string | string[]) => void;
 };
 
 export const UserStoryFormStoryFields = ({ data, onFieldChange }: Props) => {
@@ -26,7 +23,7 @@ export const UserStoryFormStoryFields = ({ data, onFieldChange }: Props) => {
           type="text"
           value={data.role}
           onChange={(e) => onFieldChange("role", e.target.value)}
-          className="apple-field"
+          className="uscreator-field"
           placeholder="e.g., user, admin, developer"
         />
       </div>
@@ -43,7 +40,7 @@ export const UserStoryFormStoryFields = ({ data, onFieldChange }: Props) => {
           type="text"
           value={data.action}
           onChange={(e) => onFieldChange("action", e.target.value)}
-          className="apple-field"
+          className="uscreator-field"
           placeholder="e.g., to save my preferences"
         />
       </div>
@@ -60,7 +57,7 @@ export const UserStoryFormStoryFields = ({ data, onFieldChange }: Props) => {
           type="text"
           value={data.benefit}
           onChange={(e) => onFieldChange("benefit", e.target.value)}
-          className="apple-field"
+          className="uscreator-field"
           placeholder="e.g., I can have a personalized experience"
         />
       </div>
@@ -70,8 +67,7 @@ export const UserStoryFormStoryFields = ({ data, onFieldChange }: Props) => {
           htmlFor="background"
           className="mb-2 block text-[13px] font-semibold text-[#a1a1a6]"
         >
-          Background/Context{" "}
-          <span className="text-[#6e6e73]">(optional)</span>
+          Background/Context <span className="text-[#6e6e73]">(optional)</span>
         </label>
         <RichTextEditor
           value={data.background || ""}

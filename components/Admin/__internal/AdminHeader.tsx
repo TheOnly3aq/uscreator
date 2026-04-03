@@ -27,14 +27,14 @@ export const AdminHeader = ({
             type="button"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="apple-btn-primary apple-btn-compact disabled:cursor-not-allowed disabled:opacity-50"
+            className="uscreator-btn-primary uscreator-btn-compact disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isRefreshing ? "Refreshing…" : "Refresh"}
           </button>
           <button
             type="button"
             onClick={onLogout}
-            className="apple-btn-secondary apple-btn-compact"
+            className="uscreator-btn-secondary uscreator-btn-compact"
           >
             Log out
           </button>

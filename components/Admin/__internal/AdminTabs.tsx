@@ -16,14 +16,14 @@ export const AdminTabs = ({ activeTab, onTabChange }: AdminTabsProps) => {
 
   return (
     <div className="border-b border-white/[0.08] bg-black/30 px-6 py-3">
-      <div className="apple-segment flex w-full max-w-xl">
+      <div className="uscreator-segment flex w-full max-w-xl">
         {tabs.map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => onTabChange(tab)}
-            className={`apple-segment-btn flex-1 ${
-              activeTab === tab ? "apple-segment-btn-active" : ""
+            className={`uscreator-segment-btn flex-1 ${
+              activeTab === tab ? "uscreator-segment-btn-active" : ""
             }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}

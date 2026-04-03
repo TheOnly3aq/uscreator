@@ -59,14 +59,14 @@ export function UserStoryPreview({
           <button
             type="button"
             onClick={onClear}
-            className="apple-btn-danger apple-btn-compact"
+            className="uscreator-btn-danger uscreator-btn-compact"
           >
             Clear
           </button>
           <button
             type="button"
             onClick={handleCopy}
-            className="apple-btn-primary apple-btn-compact"
+            className="uscreator-btn-primary uscreator-btn-compact"
           >
             {copied ? "Copied" : "Copy"}
           </button>
@@ -139,4 +139,3 @@ export function UserStoryPreview({
     </motion.div>
   );
 }
-

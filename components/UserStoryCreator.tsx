@@ -33,9 +33,7 @@ export function UserStoryCreator() {
   } = useUserStoryCreator();
 
   if (!isAuthenticated) {
-    return (
-      <PasswordGate onAuthenticated={completePasswordLogin} />
-    );
+    return <PasswordGate onAuthenticated={completePasswordLogin} />;
   }
 
   if (isBootstrapping) {
@@ -73,7 +71,7 @@ export function UserStoryCreator() {
         </motion.div>
 
         <div
-          className="apple-segment mb-4 flex w-full justify-center sm:inline-flex sm:w-auto"
+          className="uscreator-segment mb-4 flex w-full justify-center sm:inline-flex sm:w-auto"
           role="tablist"
           aria-label="Main sections"
         >
@@ -85,8 +83,8 @@ export function UserStoryCreator() {
               setActiveTab("form");
               localStorage.setItem("userstory_active_tab", "form");
             }}
-            className={`apple-segment-btn flex-1 sm:flex-none ${
-              activeTab === "form" ? "apple-segment-btn-active" : ""
+            className={`uscreator-segment-btn flex-1 sm:flex-none ${
+              activeTab === "form" ? "uscreator-segment-btn-active" : ""
             }`}
           >
             Form
@@ -99,8 +97,8 @@ export function UserStoryCreator() {
               setActiveTab("ai");
               localStorage.setItem("userstory_active_tab", "ai");
             }}
-            className={`apple-segment-btn flex-1 sm:flex-none ${
-              activeTab === "ai" ? "apple-segment-btn-active" : ""
+            className={`uscreator-segment-btn flex-1 sm:flex-none ${
+              activeTab === "ai" ? "uscreator-segment-btn-active" : ""
             }`}
           >
             AI Creation
@@ -113,8 +111,8 @@ export function UserStoryCreator() {
               setActiveTab("history");
               localStorage.setItem("userstory_active_tab", "history");
             }}
-            className={`apple-segment-btn flex-1 sm:flex-none ${
-              activeTab === "history" ? "apple-segment-btn-active" : ""
+            className={`uscreator-segment-btn flex-1 sm:flex-none ${
+              activeTab === "history" ? "uscreator-segment-btn-active" : ""
             }`}
           >
             History
@@ -127,7 +125,7 @@ export function UserStoryCreator() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="apple-panel p-6 sm:p-8"
+              className="uscreator-panel p-6 sm:p-8"
             >
               <h2 className="mb-6 text-[21px] font-semibold tracking-tight text-[#f5f5f7]">
                 Form
@@ -143,7 +141,7 @@ export function UserStoryCreator() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="apple-panel p-6 sm:p-8"
+              className="uscreator-panel p-6 sm:p-8"
             >
               <UserStoryPreview
                 data={userStoryData}
@@ -157,7 +155,7 @@ export function UserStoryCreator() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="apple-panel p-6 sm:p-8"
+            className="uscreator-panel p-6 sm:p-8"
           >
             <AICreation
               prompt={aiPrompt}
@@ -170,7 +168,7 @@ export function UserStoryCreator() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="apple-panel p-6 sm:p-8"
+            className="uscreator-panel p-6 sm:p-8"
           >
             <History
               onLoadStory={handleLoadStory}

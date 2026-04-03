@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 import { UserStoryData } from "@/types/userStory";
 import { RowDataPacket } from "mysql2";
+import { requireAppAuth } from "@/utils/appAuth";
 
 export async function POST(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
 

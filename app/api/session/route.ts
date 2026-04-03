@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 import { randomBytes } from "crypto";
 import { RowDataPacket } from "mysql2";
+import { requireAppAuth } from "@/utils/appAuth";
 
 /**
  * Gets the client IP address from the request headers
@@ -27,6 +28,11 @@ function getClientIp(request: NextRequest): string {
  * @returns {Promise<NextResponse>} Response with session ID
  */
 export async function GET(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
     const db = getPool();

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 import { UserStoryData } from "@/types/userStory";
 import { RowDataPacket } from "mysql2";
+import { requireAppAuth } from "@/utils/appAuth";
 
 interface UserStoryRecord extends RowDataPacket {
   id: number;
@@ -24,6 +25,11 @@ interface UserStoryRecord extends RowDataPacket {
  * GET handler - gets user story history for the current session
  */
 export async function GET(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
 

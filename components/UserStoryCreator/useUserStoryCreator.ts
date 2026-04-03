@@ -8,7 +8,7 @@ import {
   startTransition,
 } from "react";
 import { UserStoryData } from "@/types/userStory";
-import { getCookie, setSessionId, getSessionId } from "@/utils/cookies";
+import { setSessionId, getSessionId } from "@/utils/cookies";
 import {
   hasUserStoryContent,
   createEmptyUserStoryData,
@@ -51,20 +51,31 @@ export const useUserStoryCreator = () => {
   const userStoryData = currentType === "story" ? storyData : bugData;
 
   useEffect(() => {
-    if (getCookie() !== "authenticated") {
-      return;
-    }
-    startTransition(() => {
-      setIsAuthenticated(true);
-      setIsBootstrapping(true);
-      const savedTab = localStorage.getItem("userstory_active_tab");
-      if (
-        savedTab &&
-        (savedTab === "form" || savedTab === "history" || savedTab === "ai")
-      ) {
-        setActiveTab(savedTab as "form" | "history" | "ai");
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/");
+        const data = (await res.json()) as { authenticated?: boolean };
+        if (!data.authenticated) {
+          return;
+        }
+        startTransition(() => {
+          setIsAuthenticated(true);
+          setIsBootstrapping(true);
+          const savedTab = localStorage.getItem("userstory_active_tab");
+          if (
+            savedTab &&
+            (savedTab === "form" ||
+              savedTab === "history" ||
+              savedTab === "ai")
+          ) {
+            setActiveTab(savedTab as "form" | "history" | "ai");
+          }
+        });
+      } catch {
+        /* stay logged out */
       }
-    });
+    };
+    void checkAuth();
   }, []);
 
   useEffect(() => {

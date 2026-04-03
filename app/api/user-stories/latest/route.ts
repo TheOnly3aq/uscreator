@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 import { UserStoryData } from "@/types/userStory";
 import { RowDataPacket } from "mysql2";
+import { requireAppAuth } from "@/utils/appAuth";
 
 interface UserStoryRecord extends RowDataPacket {
   type: string;
@@ -22,6 +23,11 @@ interface UserStoryRecord extends RowDataPacket {
  * Accepts optional type query parameter to get draft for specific type
  */
 export async function GET(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
 

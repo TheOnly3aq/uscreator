@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 import { UserStoryData } from "@/types/userStory";
+import { requireAppAuth } from "@/utils/appAuth";
 
 /**
  * POST handler - saves user story data as draft (auto-save, overwrites previous draft)
  */
 export async function POST(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
 

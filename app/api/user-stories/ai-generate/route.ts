@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { UserStoryData } from "@/types/userStory";
+import { requireAppAuth } from "@/utils/appAuth";
 
 /**
  * POST handler - generates user story or bug using OpenRouter AI
  */
 export async function POST(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     const { prompt, type } = await request.json();
 

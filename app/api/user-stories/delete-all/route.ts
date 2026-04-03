@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
+import { requireAppAuth } from "@/utils/appAuth";
 
 /**
  * DELETE handler - deletes only draft user stories for the current session (preserves saved history)
  */
 export async function DELETE(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
 

@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPool, initializeDatabase } from "@/utils/db";
 import { RowDataPacket } from "mysql2";
+import { requireAppAuth } from "@/utils/appAuth";
 
 /**
  * GET handler - retrieves the AI prompt from the session
  */
 export async function GET(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
     const db = getPool();
@@ -36,6 +42,11 @@ export async function GET(request: NextRequest) {
  * POST handler - saves the AI prompt to the session
  */
 export async function POST(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
     const db = getPool();
@@ -69,6 +80,11 @@ export async function POST(request: NextRequest) {
  * DELETE handler - clears the AI prompt from the session
  */
 export async function DELETE(request: NextRequest) {
+  const authError = requireAppAuth(request);
+  if (authError) {
+    return authError;
+  }
+
   try {
     await initializeDatabase();
     const db = getPool();

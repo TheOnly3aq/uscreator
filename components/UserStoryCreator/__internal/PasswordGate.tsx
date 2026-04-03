@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { setCookie } from "@/utils/cookies";
-
 interface PasswordGateProps {
   onAuthenticated: () => void;
 }
@@ -31,7 +29,6 @@ export function PasswordGate({ onAuthenticated }: PasswordGateProps) {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setCookie("authenticated", 7);
         onAuthenticated();
       } else {
         setError(data.error || "Invalid password");

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
+import { MagentoWappalyzerSpoof } from "@/components/MagentoWappalyzerSpoof";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" data-image-optimizing-origin="">
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col bg-black text-[#f5f5f7]`}
       >
+        <MagentoWappalyzerSpoof />
         <main className="flex-1 flex flex-col">{children}</main>
         <Footer />
       </body>

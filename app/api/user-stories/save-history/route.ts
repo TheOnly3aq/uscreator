@@ -3,10 +3,6 @@ import { getPool, initializeDatabase } from "@/utils/db";
 import { UserStoryData } from "@/types/userStory";
 import { RowDataPacket } from "mysql2";
 
-/**
- * POST handler - saves user story to history (when Copy is clicked)
- * Limits to 10 history items per user, deletes oldest if exceeded
- */
 export async function POST(request: NextRequest) {
   try {
     await initializeDatabase();
@@ -21,6 +17,37 @@ export async function POST(request: NextRequest) {
 
     const data: UserStoryData = await request.json();
     const db = getPool();
+
+    if (data.storyId && data.storyId.trim()) {
+      const [existingRows] = await db.execute<RowDataPacket[]>(
+        `SELECT id FROM user_stories 
+         WHERE session_id = ? AND story_id = ? AND is_draft = FALSE
+         LIMIT 1`,
+        [sessionId, data.storyId.trim()]
+      );
+
+      if (existingRows.length > 0) {
+        await db.execute(
+          `UPDATE user_stories 
+           SET type = ?, title = ?, role = ?, action = ?, benefit = ?, background = ?, additional_info = ?, acceptance_criteria = ?, technical_info = ?, is_ai_generated = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ?`,
+          [
+            data.type || "story",
+            data.title || null,
+            data.role || null,
+            data.action || null,
+            data.benefit || null,
+            data.background || null,
+            data.additionalInfo || null,
+            JSON.stringify(data.acceptanceCriteria || []),
+            JSON.stringify(data.technicalInfo || []),
+            data.isAiGenerated || false,
+            existingRows[0].id,
+          ]
+        );
+        return NextResponse.json({ success: true, updated: true });
+      }
+    }
 
     const [countRows] = await db.execute<RowDataPacket[]>(
       `SELECT COUNT(*) as count FROM user_stories 
@@ -48,11 +75,13 @@ export async function POST(request: NextRequest) {
 
     await db.execute(
       `INSERT INTO user_stories 
-       (session_id, type, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE)`,
+       (session_id, type, story_id, title, role, action, benefit, background, additional_info, acceptance_criteria, technical_info, is_draft, is_ai_generated)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FALSE, ?)`,
       [
         sessionId,
         data.type || "story",
+        data.storyId || null,
+        data.title || null,
         data.role || null,
         data.action || null,
         data.benefit || null,
@@ -60,10 +89,11 @@ export async function POST(request: NextRequest) {
         data.additionalInfo || null,
         JSON.stringify(data.acceptanceCriteria || []),
         JSON.stringify(data.technicalInfo || []),
+        data.isAiGenerated || false,
       ]
     );
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, updated: false });
   } catch (error) {
     console.error("Error saving to history:", error);
     return NextResponse.json(

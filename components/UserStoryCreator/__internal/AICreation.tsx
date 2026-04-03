@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserStoryData } from "@/types/userStory";
+import { generateStoryId } from "@/utils/userStoryHelpers";
 
 interface AICreationProps {
   onGenerate: (data: UserStoryData) => void;
@@ -36,11 +37,10 @@ export function AICreation({
    * @returns {boolean} True if the prompt is too thin
    */
   const isPromptTooThin = (promptText: string): boolean => {
-    const trimmed = promptText.trim();
-    if (!trimmed) return true;
-
-    const words = trimmed.split(/\s+/).filter((word) => word.length > 0);
-
+    const words = promptText
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
     return words.length < 10;
   };
 
@@ -55,9 +55,7 @@ export function AICreation({
       return;
     }
 
-    if (showThinPromptModal) {
-      setShowThinPromptModal(false);
-    }
+    setShowThinPromptModal(false);
 
     setIsGenerating(true);
     setError(null);
@@ -78,7 +76,11 @@ export function AICreation({
       }
 
       if (result.data) {
-        onGenerate(result.data);
+        onGenerate({
+          ...result.data,
+          isAiGenerated: true,
+          storyId: result.data.storyId || generateStoryId(),
+        });
       } else {
         throw new Error("No data received from AI");
       }
@@ -117,7 +119,7 @@ export function AICreation({
       } catch (err) {
         console.error("Failed to save prompt:", err);
       }
-    }, 500); // Debounce for 500ms
+    }, 500);
 
     return () => {
       if (saveTimeoutRef.current) {
@@ -147,18 +149,16 @@ export function AICreation({
   };
 
   useEffect(() => {
+    if (!showThinPromptModal) return;
+
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && showThinPromptModal) {
+      if (e.key === "Escape") {
         setShowThinPromptModal(false);
       }
     };
 
-    if (showThinPromptModal) {
-      document.addEventListener("keydown", handleEscape);
-      setTimeout(() => {
-        modalRef.current?.focus();
-      }, 100);
-    }
+    document.addEventListener("keydown", handleEscape);
+    setTimeout(() => modalRef.current?.focus(), 100);
 
     return () => {
       document.removeEventListener("keydown", handleEscape);

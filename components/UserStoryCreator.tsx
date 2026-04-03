@@ -13,6 +13,7 @@ import { getCookie, setSessionId, getSessionId } from "@/utils/cookies";
 import {
   hasUserStoryContent,
   createEmptyUserStoryData,
+  generateStoryId,
 } from "@/utils/userStoryHelpers";
 import { PasswordGate } from "./UserStoryCreator/__internal/PasswordGate";
 import { UserStoryForm } from "./UserStoryCreator/__internal/UserStoryForm";
@@ -124,13 +125,13 @@ export function UserStoryCreator() {
           ]);
 
         if (storyResult.data) {
-          setStoryData(storyResult.data);
+          setStoryData({ ...storyResult.data, storyId: storyResult.data.storyId || generateStoryId() });
         } else {
           setStoryData(createEmptyUserStoryData("story"));
         }
 
         if (bugResult.data) {
-          setBugData(bugResult.data);
+          setBugData({ ...bugResult.data, storyId: bugResult.data.storyId || generateStoryId() });
         } else {
           setBugData(createEmptyUserStoryData("bug"));
         }
@@ -204,12 +205,17 @@ export function UserStoryCreator() {
   }, [userStoryData, isAuthenticated, saveUserStory]);
 
   const handleDataChange = useCallback((data: UserStoryData) => {
+    const currentData = data.type === "story" ? storyData : bugData;
+    const dataWithId = {
+      ...data,
+      storyId: data.storyId || currentData.storyId || generateStoryId(),
+    };
     if (data.type === "story") {
-      setStoryData(data);
+      setStoryData(dataWithId);
     } else {
-      setBugData(data);
+      setBugData(dataWithId);
     }
-  }, []);
+  }, [storyData, bugData]);
 
   const handleTypeChange = useCallback(
     async (newType: "story" | "bug") => {
@@ -245,9 +251,9 @@ export function UserStoryCreator() {
         const { data } = await response.json();
         if (data) {
           if (newType === "story") {
-            setStoryData(data);
+            setStoryData({ ...data, storyId: data.storyId || generateStoryId() });
           } else {
-            setBugData(data);
+            setBugData({ ...data, storyId: data.storyId || generateStoryId() });
           }
         } else {
           const emptyData = createEmptyUserStoryData(newType);
@@ -293,13 +299,18 @@ export function UserStoryCreator() {
       return;
     }
 
+    const dataToSave = {
+      ...userStoryData,
+      storyId: userStoryData.storyId || generateStoryId(),
+    };
+
     try {
       const saveResponse = await fetch("/api/user-stories/save-history/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userStoryData),
+        body: JSON.stringify(dataToSave),
       });
       if (!saveResponse.ok) {
         return;
@@ -317,10 +328,11 @@ export function UserStoryCreator() {
   }, [userStoryData]);
 
   const handleLoadStory = useCallback((data: UserStoryData) => {
+    const storyWithId = { ...data, storyId: data.storyId || generateStoryId() };
     if (data.type === "story") {
-      setStoryData(data);
+      setStoryData(storyWithId);
     } else {
-      setBugData(data);
+      setBugData(storyWithId);
     }
     setCurrentType(data.type);
     localStorage.setItem("userstory_selected_type", data.type);
@@ -329,10 +341,11 @@ export function UserStoryCreator() {
   }, []);
 
   const handleAIGenerate = useCallback((data: UserStoryData) => {
+    const storyWithId = { ...data, storyId: data.storyId || generateStoryId() };
     if (data.type === "story") {
-      setStoryData(data);
+      setStoryData(storyWithId);
     } else {
-      setBugData(data);
+      setBugData(storyWithId);
     }
     setCurrentType(data.type);
     localStorage.setItem("userstory_selected_type", data.type);

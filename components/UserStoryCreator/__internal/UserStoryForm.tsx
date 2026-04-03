@@ -77,6 +77,24 @@ export function UserStoryForm({ data, onChange, onTypeChange }: UserStoryFormPro
         </select>
       </div>
 
+      <div>
+        <label
+          htmlFor="title"
+          className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300"
+        >
+          Title{" "}
+          <span className="text-zinc-500 dark:text-zinc-400">(optional)</span>
+        </label>
+        <input
+          id="title"
+          type="text"
+          value={data.title || ""}
+          onChange={(e) => handleChange("title", e.target.value)}
+          className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+          placeholder="e.g., User Preference Saving Feature"
+        />
+      </div>
+
       {data.type === "bug" ? (
         <>
           <div>

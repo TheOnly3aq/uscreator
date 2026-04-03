@@ -77,7 +77,6 @@ export async function initializeDatabase(): Promise<void> {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  // Add is_draft column if it doesn't exist (for existing databases)
   try {
     const [columns] = await db.execute<RowDataPacket[]>(
       `SHOW COLUMNS FROM user_stories LIKE 'is_draft'`
@@ -88,11 +87,8 @@ export async function initializeDatabase(): Promise<void> {
         ADD COLUMN is_draft BOOLEAN DEFAULT FALSE
       `);
     }
-  } catch {
-    // Column might already exist, ignore error
-  }
+  } catch {}
 
-  // Add type column if it doesn't exist (for existing databases)
   try {
     const [columns] = await db.execute<RowDataPacket[]>(
       `SHOW COLUMNS FROM user_stories LIKE 'type'`
@@ -103,11 +99,8 @@ export async function initializeDatabase(): Promise<void> {
         ADD COLUMN type VARCHAR(10) DEFAULT 'story'
       `);
     }
-  } catch {
-    // Column might already exist, ignore error
-  }
+  } catch {}
 
-  // Add additional_info column if it doesn't exist (for existing databases)
   try {
     const [columns] = await db.execute<RowDataPacket[]>(
       `SHOW COLUMNS FROM user_stories LIKE 'additional_info'`
@@ -118,11 +111,45 @@ export async function initializeDatabase(): Promise<void> {
         ADD COLUMN additional_info TEXT
       `);
     }
-  } catch {
-    // Column might already exist, ignore error
-  }
+  } catch {}
 
-  // Create sessions table for storing session metadata
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'title'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN title VARCHAR(500)
+      `);
+    }
+  } catch {}
+
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'is_ai_generated'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN is_ai_generated BOOLEAN DEFAULT FALSE
+      `);
+    }
+  } catch {}
+
+  try {
+    const [columns] = await db.execute<RowDataPacket[]>(
+      `SHOW COLUMNS FROM user_stories LIKE 'story_id'`
+    );
+    if (columns.length === 0) {
+      await db.execute(`
+        ALTER TABLE user_stories 
+        ADD COLUMN story_id VARCHAR(255),
+        ADD INDEX idx_story_id (story_id)
+      `);
+    }
+  } catch {}
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS sessions (
       session_id VARCHAR(255) PRIMARY KEY,
@@ -134,7 +161,6 @@ export async function initializeDatabase(): Promise<void> {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  // Add ip_addresses column if it doesn't exist (for existing databases)
   try {
     const [columns] = await db.execute<RowDataPacket[]>(
       `SHOW COLUMNS FROM sessions LIKE 'ip_addresses'`
@@ -145,11 +171,8 @@ export async function initializeDatabase(): Promise<void> {
         ADD COLUMN ip_addresses JSON
       `);
     }
-  } catch {
-    // Column might already exist, ignore error
-  }
+  } catch {}
 
-  // Add ai_prompt column if it doesn't exist (for existing databases)
   try {
     const [columns] = await db.execute<RowDataPacket[]>(
       `SHOW COLUMNS FROM sessions LIKE 'ai_prompt'`

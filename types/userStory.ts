@@ -1,5 +1,7 @@
 export interface UserStoryData {
   type: "story" | "bug";
+  storyId?: string;
+  title?: string;
   role: string;
   action: string;
   benefit: string;
@@ -7,4 +9,5 @@ export interface UserStoryData {
   additionalInfo?: string;
   acceptanceCriteria: string[];
   technicalInfo: string[];
+  isAiGenerated?: boolean;
 }

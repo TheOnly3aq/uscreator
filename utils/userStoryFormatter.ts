@@ -22,6 +22,11 @@ function htmlToMarkdown(html: string): string {
 export function formatUserStory(data: UserStoryData): string {
   const parts: string[] = [];
 
+  if (data.title && data.title.trim()) {
+    parts.push(data.title.trim());
+    parts.push('');
+  }
+
   if (data.type === "bug") {
     if (data.role && data.role.trim()) {
       parts.push(data.role.trim());

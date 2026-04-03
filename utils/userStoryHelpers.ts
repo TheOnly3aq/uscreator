@@ -1,12 +1,12 @@
 import { UserStoryData } from "@/types/userStory";
 
-/**
- * Checks if a user story has any content
- * @param data - The user story data to check
- * @returns {boolean} True if the user story has any content, false otherwise
- */
+export const generateStoryId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+};
+
 export const hasUserStoryContent = (data: UserStoryData): boolean => {
   return (
+    !!data.title?.trim() ||
     !!data.role.trim() ||
     !!data.action.trim() ||
     !!data.benefit.trim() ||
@@ -17,16 +17,12 @@ export const hasUserStoryContent = (data: UserStoryData): boolean => {
   );
 };
 
-/**
- * Creates an empty user story data object
- * @param type - The type of user story ("story" or "bug")
- * @returns {UserStoryData} An empty user story data object
- */
 export const createEmptyUserStoryData = (
   type: "story" | "bug"
 ): UserStoryData => {
   return {
     type,
+    storyId: generateStoryId(),
     role: "",
     action: "",
     benefit: "",

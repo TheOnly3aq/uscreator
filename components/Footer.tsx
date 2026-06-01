@@ -9,7 +9,7 @@ export const Footer = () => {
         <div className="flex flex-col items-center justify-center gap-2 text-center text-[13px] text-[#a1a1a6]">
           <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-3">
             <span className="font-medium text-[#f5f5f7] transition-colors hover:text-white">
-              My by KT
+              Made by KT
             </span>
             <span className="hidden text-[#424245] sm:inline" aria-hidden>
               •
